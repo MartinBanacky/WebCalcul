@@ -1,0 +1,147 @@
+﻿@page "/"
+
+<h3>Calculator</h3>
+
+<input type="text" @bind="input" readonly />
+
+@for (int i = 1; i <= 9; i++)
+{
+    var num = i;
+    if (i == 1)
+    {
+        <br />
+    }
+    <Button @onclick="() => AppendNumber(num)">@num</Button>
+    if (i % 3 == 0)
+    {
+        <br />
+    }
+}
+
+<button @onclick="CalculateResult">=</button>
+<button @onclick="Clear">C</button>
+<button @onclick="Sum">+</button>
+<button @onclick="Sub">-</button>
+<button @onclick="Pow">*</button>
+<button @onclick="Div">/</button>
+<button @onclick="BracketL">(</button>
+<button @onclick="BracketR">)</button>
+<button @onclick="ClearEnd">CE</button>
+
+
+<p>Result: @result</p>
+<p>Info: @info</p>
+
+
+@code {
+	private string input = string.Empty;
+	private string result = string.Empty;
+	private string info = string.Empty;
+
+	private void AppendNumber(int number)
+	{
+		if (!string.IsNullOrEmpty(info)){ info = string.Empty; }
+		input += number.ToString();
+	}
+
+	private bool ExpressionValidation(string exp)
+	{
+		var bracketCounter = 0; //0 is valid state
+
+		for (int i = 0; i < exp.Length - 1; i++)
+		{
+			char currentChar = exp[i];
+			char nextChar = exp[i + 1];
+
+			if (currentChar == 40) { bracketCounter++; }
+			if (currentChar == 41) { bracketCounter--; }
+
+			
+		}
+
+		return false;
+	}
+
+	private void CalculateResult()
+	{
+
+		ExpressionValidation(input);
+
+
+
+	}
+
+	private void Clear()
+	{
+		input = string.Empty;
+		result = string.Empty;
+	}
+
+	private void AppendOperation(char operation)
+	{
+		if (!string.IsNullOrEmpty(input) && operation != '(' && operation != ')')
+		{
+			CheckLastChar(input[input.Length - 1]);
+		}
+		input += operation;
+	}
+
+	private void Sum(MouseEventArgs e)
+	{
+		AppendOperation('+');
+	}
+	private void Sub(MouseEventArgs e)
+	{
+		AppendOperation('-');
+	}
+	private void Pow(MouseEventArgs e)
+	{
+		AppendOperation('*');
+	}
+	private void Div(MouseEventArgs e)
+	{
+		AppendOperation('/');
+	}
+	private void BracketL(MouseEventArgs e)
+	{
+		AppendOperation('(');
+	}
+	private void BracketR(MouseEventArgs e)
+	{
+		AppendOperation(')');
+	}
+
+	private void ClearEnd(MouseEventArgs e)
+	{
+		RemoveLastCharacter(input);
+	}
+
+	/// <summary>
+	/// Remove last character from input
+	/// </summary>
+	private void RemoveLastCharacter(string input)
+	{
+		if (!string.IsNullOrEmpty(input))
+		{
+
+			input = input.Remove(input.Length - 1);
+		}
+	}
+
+	/// <summary>
+	/// Check if last character was not number or bracket.
+	/// </summary>
+	private bool RewriteLastChar(char lastChar)
+	{
+		return lastChar != 40 && lastChar != 41 && lastChar < 48 || lastChar > 57;
+	}
+
+	/// <summary>
+	/// Check if last character have to be rewritten. If true, rewrite it.
+	/// </summary>
+	private void CheckLastChar(char lastChar)
+	{
+		if (RewriteLastChar(lastChar)){ info = "operator changed"; input = input.Remove(input.Length - 1); }
+	}
+
+}
