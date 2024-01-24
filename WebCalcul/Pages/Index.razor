@@ -56,19 +56,106 @@
 			if (currentChar == 40) { bracketCounter++; }
 			if (currentChar == 41) { bracketCounter--; }
 
-			
+			switch (currentChar, nextChar)
+			{
+				case ('(', '*' or '/' or '+'):
+					info = "Syntax error at position: " + (++i).ToString() + " Character: " + nextChar; 
+					return false;
+
+				default:
+					break;
+			}
+
 		}
 
 		return false;
 	}
+
+	private static IEnumerable<string> ConvertToRPN(string expression)
+	{
+		var outputQueue = new Queue<string>();
+		var operatorStack = new Stack<char>();
+
+		for (int i = 0; i < expression.Length; i++)
+		{
+			char token = expression[i];
+
+			if (char.IsDigit(token))
+			{
+				string number = token.ToString();
+
+				while (i < expression.Length - 1 && char.IsDigit(expression[i + 1]))
+				{
+					number += expression[++i];
+				}
+
+				outputQueue.Enqueue(number);
+			}
+			else if (IsOperator(token))
+			{
+				while (operatorStack.Count > 0 && IsOperator(operatorStack.Peek()) &&
+								HasHigherPrecedence(operatorStack.Peek(), token))
+				{
+					outputQueue.Enqueue(operatorStack.Pop().ToString());
+				}
+
+				operatorStack.Push(token);
+			}
+			else if (token == '(')
+			{
+				operatorStack.Push(token);
+			}
+			else if (token == ')')
+			{
+				while (operatorStack.Count > 0 && operatorStack.Peek() != '(')
+				{
+					outputQueue.Enqueue(operatorStack.Pop().ToString());
+				}
+				operatorStack.Pop();
+			}
+		}
+
+		while (operatorStack.Count > 0)
+		{
+			outputQueue.Enqueue(operatorStack.Pop().ToString());
+		}
+
+		return outputQueue;
+	}
+
+	private static bool IsOperator(char token)
+	{
+		return token == '+' || token == '-' || token == '*' || token == '/';
+	}
+
+	private static bool HasHigherPrecedence(char op1, char op2)
+	{
+		if ((op1 == '*' || op1 == '/') && (op2 == '+' || op2 == '-'))
+		{
+			return true;
+		}
+		else if ((op1 == '+' || op1 == '-') && (op2 == '+' || op2 == '-'))
+		{
+			return false;
+		}
+		else if ((op1 == '*' || op1 == '/') && (op2 == '*' || op2 == '/'))
+		{
+			return false;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 
 	private void CalculateResult()
 	{
 
 		ExpressionValidation(input);
 
-
-
+		var rpn = ConvertToRPN(input);
+		info = string.Join(" ", rpn);
 	}
 
 	private void Clear()
@@ -79,7 +166,8 @@
 
 	private void AppendOperation(char operation)
 	{
-		if (!string.IsNullOrEmpty(input) && operation != '(' && operation != ')')
+		if (operation == '(' || operation == ')') { info = string.Empty; input += operation; return; }
+		if (!string.IsNullOrEmpty(input))
 		{
 			CheckLastChar(input[input.Length - 1]);
 		}
@@ -113,25 +201,25 @@
 
 	private void ClearEnd(MouseEventArgs e)
 	{
-		RemoveLastCharacter(input);
+		RemoveLastCharacter(input, out input);
 	}
 
 	/// <summary>
 	/// Remove last character from input
 	/// </summary>
-	private void RemoveLastCharacter(string input)
+	private void RemoveLastCharacter(string input, out string output)
 	{
+		output = string.Empty;
 		if (!string.IsNullOrEmpty(input))
 		{
-
-			input = input.Remove(input.Length - 1);
+			output = input.Remove(input.Length - 1);
 		}
 	}
 
 	/// <summary>
 	/// Check if last character was not number or bracket.
 	/// </summary>
-	private bool RewriteLastChar(char lastChar)
+	private bool RewriteOperator(char lastChar)
 	{
 		return lastChar != 40 && lastChar != 41 && lastChar < 48 || lastChar > 57;
 	}
@@ -141,7 +229,7 @@
 	/// </summary>
 	private void CheckLastChar(char lastChar)
 	{
-		if (RewriteLastChar(lastChar)){ info = "operator changed"; input = input.Remove(input.Length - 1); }
+		if (RewriteOperator(lastChar)) { info = "operator changed"; input = input.Remove(input.Length - 1); }
 	}
 
 }
