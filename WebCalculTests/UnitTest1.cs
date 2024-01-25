@@ -46,42 +46,42 @@ namespace WebCalculTests
 		}
 
 		[TestMethod]
-		public void ApplyOperand_FloatAddition_ReturnsCorrectSum()
+		public void ApplyOperand_DoubleAddition_ReturnsCorrectSum()
 		{
-			var calc = new Calcul(5.5f, 3.3f, '+');
+			var calc = new Calcul(5.5d, 3.3d, '+');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(8.8f, result, 0.0001f); // Using a delta for float comparison
+			Assert.AreEqual(8.8d, result, 0.0001d);
 		}
 
 		[TestMethod]
-		public void ApplyOperand_FloatSubtraction_ReturnsCorrectDifference()
+		public void ApplyOperand_DoubleSubtraction_ReturnsCorrectDifference()
 		{
-			var calc = new Calcul(5.5f, 3.3f, '-');
+			var calc = new Calcul(5.5d, 3.3d, '-');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(2.2f, result, 0.0001f); // Using a delta for float comparison
+			Assert.AreEqual(2.2d, result, 0.0001d); 
 		}
 
 		[TestMethod]
-		public void ApplyOperand_FloatMultiplication_ReturnsCorrectProduct()
+		public void ApplyOperand_DoubleMultiplication_ReturnsCorrectProduct()
 		{
-			var calc = new Calcul(5.5f, 2f, '*');
+			var calc = new Calcul(5.5d, 2d, '*');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(11f, result, 0.0001f); // Using a delta for float comparison
+			Assert.AreEqual(11d, result, 0.0001d);
 		}
 
 		[TestMethod]
-		public void ApplyOperand_FloatDivision_ReturnsCorrectQuotient()
+		public void ApplyOperand_DoubleDivision_ReturnsCorrectQuotient()
 		{
-			var calc = new Calcul(5.5f, 2f, '/');
+			var calc = new Calcul(5.5d, 2d, '/');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(2.75f, result, 0.0001f); // Using a delta for float comparison
+			Assert.AreEqual(2.75d, result, 0.0001d); 
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(DivideByZeroException))]
-		public void ApplyOperand_FloatDivisionByZero_ThrowsException()
+		public void ApplyOperand_DoubleDivisionByZero_ThrowsException()
 		{
-			var calc = new Calcul(5.5f, 0f, '/');
+			var calc = new Calcul(5.5d, 0d, '/');
 			calc.ApplyOperand();
 		}
 	}

@@ -49,19 +49,19 @@
 	private Calcul cal = new Calcul();
 
 
-	private float StringToFloat(string input)
+	private double StringToDouble(string input)
 	{
-		float outputFloat = 0;
+		double outputDouble = 0;
 		try
 		{
-			outputFloat = float.Parse(input);
+			outputDouble = double.Parse(input);
 		}
 		catch (FormatException)
 		{
 			Console.WriteLine($"Unable to parse '{input}'");
 			return 0;
 		}
-		return outputFloat;
+		return outputDouble;
 	}
 
 	private void ExecuteExpression(ref Calcul calcul, bool operatorActiveSign, string inputField)
@@ -74,7 +74,7 @@
 			numBUncut = numBUncut.Remove(numBUncut.Length - 1);
 		}
 
-		calcul.B = StringToFloat(numBUncut);
+		calcul.B = StringToDouble(numBUncut);
 		calcul.A = calcul.ApplyOperand();
 	}
 
@@ -98,7 +98,7 @@
 					info = "You cannot divide by 0!";
 				}
 
-				//TODO vymyslieť prepisovanie operatora a zadať reštrikcie pre hranice čis. datoveho typu float(inak to pada!)
+				//TODO vymyslieť prepisovanie operatora a zadať reštrikcie pre hranice čis. datoveho typu double(inak to pada!)
 				cal.ActiveOperator = input[input.Length - 1];
 
 			}
@@ -107,7 +107,7 @@
 				cal.ActiveOperator = input[input.Length - 1];
 				RemoveLastCharacter(input, out input);
 				//set numA
-				cal.A = StringToFloat(input);
+				cal.A = StringToDouble(input);
 			}
 
 			output = cal.A.ToString() + cal.ActiveOperator;
@@ -136,8 +136,8 @@
 		}
 	}
 
-
-
+	//TODO vyriešiť case keď vynasobime na strasne velke cislo xxe ** 100+ a vymazeme input tak sa nic nedeje a ked adme nulu vysledok je -0!
+	
 	private void AppendOperation(char operation)
 	{
 		operatorActive = true;

@@ -5,19 +5,19 @@ namespace WebCalcul.Data
 {
     public class Calcul
     {
-        private float a;
-        private float b;
+        private double a;
+        private double b;
         private char activeOperator;
 
 		public Calcul(){}
-		public Calcul(float numA, float numB, char oper)
+		public Calcul(double numA, double numB, char oper)
         {
             a = numA;
             b = numB;
             activeOperator = oper;
         }
 
-		public float ApplyOperand()
+		public double ApplyOperand()
 		{
 			switch (activeOperator)
 			{
@@ -35,13 +35,13 @@ namespace WebCalcul.Data
 		}
 
 		// Properties
-		public float A
+		public double A
 		{
 			get { return a; }
 			set { a = value; }
 		}
 
-		public float B
+		public double B
 		{
 			get { return b; }
 			set { b = value; }
