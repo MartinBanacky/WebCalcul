@@ -1,4 +1,5 @@
-﻿@page "/"
+﻿@using WebCalcul.Data
+@page "/"
 
 <h3>Calculator</h3>
 
@@ -39,32 +40,14 @@
 
 
 @code {
+
 	private string input = string.Empty;
 	private string output = string.Empty;
 	private string result = string.Empty;
 	private string info = string.Empty;
 	private bool operatorActive = false;
-	private char operatorChar = '\0';
-	private float numA;
-	private float numB;
+	private Calcul cal = new Calcul();
 
-
-	private float ApplyOperand(float a, float b, char operand)
-	{
-		switch (operand)
-		{
-			case '+': return a = a + b;
-			case '-': return a = a - b;
-			case '*': return a = a * b;
-			case '/': 
-				if (b != 0 && a != 0)
-				{
-					return a = a / b;	
-				}
-				else throw new DivideByZeroException("Division by zero is not allowed.");
-			default: return 0;
-		}
-	}
 
 	private float StringToFloat(string input)
 	{
@@ -81,17 +64,18 @@
 		return outputFloat;
 	}
 
-	private void ExecuteExpression(ref float numberA, ref float numberB, bool operatorActiveSign, string inputField, char operatorCharacter)
+	private void ExecuteExpression(ref Calcul calcul, bool operatorActiveSign, string inputField)
 	{
 		var numBUncut = string.Empty;
 		numBUncut += inputField;
+		//if we do not use button "=", we cut off operand
 		if (operatorActiveSign)
 		{
 			numBUncut = numBUncut.Remove(numBUncut.Length - 1);
 		}
 
-		numberB = StringToFloat(numBUncut);
-		numberA = ApplyOperand(numberA, numberB, operatorCharacter);
+		calcul.B = StringToFloat(numBUncut);
+		calcul.A = calcul.ApplyOperand();//TODO tu by som uz mal amt v calcul objekte aj operand!
 	}
 
 	private void AppendNumber(int number)
@@ -104,9 +88,9 @@
 			{
 				try
 				{
-					ExecuteExpression(ref numA, ref numB, operatorActive, input, operatorChar);
+					ExecuteExpression(ref cal, operatorActive, input);
 
-					operatorChar = input[input.Length - 1];
+					cal.ActiveOperator = input[input.Length - 1];
 				}
 				catch (DivideByZeroException)
 				{
@@ -115,18 +99,18 @@
 				}
 
 				//TODO vymyslieť prepisovanie operatora a zadať reštrikcie pre hranice čis. datoveho typu float(inak to pada!)
-				operatorChar = input[input.Length - 1];
+				cal.ActiveOperator = input[input.Length - 1];
 
 			}
 			else //Here we just rewrite input into output field
 			{	
-				operatorChar = input[input.Length - 1];
+				cal.ActiveOperator = input[input.Length - 1];
 				RemoveLastCharacter(input, out input);
 				//set numA
-				numA = StringToFloat(input);
+				cal.A = StringToFloat(input);
 			}
 
-			output = numA.ToString() + operatorChar;
+			output = cal.A.ToString() + cal.ActiveOperator;
 			operatorActive = false;
 			input = string.Empty;
 		}
@@ -140,15 +124,15 @@
 		{
 			try
 			{
-				ExecuteExpression(ref numA, ref numB, operatorActive, input, operatorChar);
-				output = numA.ToString() + operatorChar;
+				ExecuteExpression(ref cal, operatorActive, input);
+				output = cal.A.ToString() + cal.ActiveOperator;
 			}
 			catch (DivideByZeroException)
 			{
 				Clear();
 				info = "You cannot divide by 0!";
 			}
-			
+
 		}
 	}
 
@@ -172,8 +156,7 @@
 		input = string.Empty;
 		result = string.Empty;
 		output = string.Empty;
-		numA = 0;
-		numB = 0;
+		cal = new Calcul();
 	}
 
 	//Funcs for Appending operations onto buttons
