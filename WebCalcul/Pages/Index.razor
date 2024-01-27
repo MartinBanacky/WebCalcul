@@ -1,9 +1,15 @@
 ﻿@using WebCalcul.Data
 @page "/"
 
+<style>
+	.calculator-input {
+		text-align: right;
+	}
+</style>
+
 <h3>Calculator</h3>
 
-<input type="text" @bind="input" readonly />
+<input type="text" class="calculator-input" @bind="input" readonly />
 <p>Calculate: @output</p>
 
 @for (int i = 0; i <= 9; i++)
@@ -33,6 +39,7 @@
 @* <button @onclick="BracketL">(</button>
 <button @onclick="BracketR">)</button> *@
 <button @onclick="ClearEnd">CE</button>
+<button @onclick="InsertDot">,</button>
 
 
 <p>Result: @result</p>
@@ -41,13 +48,22 @@
 
 @code {
 
+
+
 	private string input = string.Empty;
 	private string output = string.Empty;
 	private string result = string.Empty;
 	private string info = string.Empty;
 	private bool operatorActive = false;
+	private bool fractionsActive = false;
+	private bool negativeActive = false;
 	private Calcul cal = new Calcul();
 
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		input = cal.A.ToString();
+	}
 
 	private double StringToDouble(string input)
 	{
@@ -64,56 +80,62 @@
 		return outputDouble;
 	}
 
-	private void ExecuteExpression(ref Calcul calcul, bool operatorActiveSign, string inputField)
+	private void ExecuteExpression(ref Calcul calcul, string inputField)
 	{
-		var numBUncut = string.Empty;
-		numBUncut += inputField;
-		//if we do not use button "=", we cut off operand
-		if (operatorActiveSign)
-		{
-			numBUncut = numBUncut.Remove(numBUncut.Length - 1);
-		}
-
-		calcul.B = StringToDouble(numBUncut);
-		calcul.A = calcul.ApplyOperand();
+		calcul.B = StringToDouble(input);
+		calcul.A = calcul.ApplyOperand();	
 	}
 
-	private void AppendNumber(int number)
+	private void UpdateOutput()
 	{
-		info = string.Empty;
-		if (!string.IsNullOrEmpty(input) && operatorActive)
+		ExecuteExpression(ref cal, input);
+		output = cal.A.ToString() + cal.ActiveOperator;
+	}
+	private void UpdateSign()
+	{
+		output = cal.A.ToString() + cal.ActiveOperator;
+	}
+
+	private void AppendNumber(double number)
+	{
+		if (operatorActive)
 		{
-			//if output already contain some number we execute math expression
-			if (!string.IsNullOrEmpty(output))
-			{
-				try
-				{
-					ExecuteExpression(ref cal, operatorActive, input);
-
-					cal.ActiveOperator = input[input.Length - 1];
-				}
-				catch (DivideByZeroException)
-				{
-					Clear();
-					info = "You cannot divide by 0!";
-				}
-
-				//TODO vymyslieť prepisovanie operatora a zadať reštrikcie pre hranice čis. datoveho typu double(inak to pada!)
-				cal.ActiveOperator = input[input.Length - 1];
-
-			}
-			else //Here we just rewrite input into output field
-			{	
-				cal.ActiveOperator = input[input.Length - 1];
-				RemoveLastCharacter(input, out input);
-				//set numA
-				cal.A = StringToDouble(input);
-			}
-
-			output = cal.A.ToString() + cal.ActiveOperator;
 			operatorActive = false;
-			input = string.Empty;
 		}
+
+		// info = string.Empty;
+		// if (!string.IsNullOrEmpty(input) && operatorActive)
+		// {
+		// 	//if output already contain some number we execute math expression
+		// 	if (!string.IsNullOrEmpty(output))
+		// 	{
+		// 		try
+		// 		{
+		// 			ExecuteExpression(ref cal, operatorActive, input);
+
+		// 			cal.ActiveOperator = input[input.Length - 1];
+		// 		}
+		// 		catch (DivideByZeroException)
+		// 		{
+		// 			Clear();
+		// 			info = "You cannot divide by 0!";
+		// 		}
+
+		// 		//TODO vymyslieť prepisovanie operatora a zadať reštrikcie pre hranice čis. datoveho typu double(inak to pada!)
+		// 		cal.ActiveOperator = input[input.Length - 1];
+
+		// 	}
+		// 	else //Here we just rewrite input into output field
+		// 	{	
+		// 		cal.A = StringToDouble(input);
+		// 	}
+
+		// 	UpdateOutput();
+		// 	operatorActive = false;
+		// 	fractionsActive = false;
+		// 	input = string.Empty;
+		// }
+		if (input == "0") input = string.Empty;
 		input += number.ToString();
 	}
 
@@ -124,7 +146,7 @@
 		{
 			try
 			{
-				ExecuteExpression(ref cal, operatorActive, input);
+				ExecuteExpression(ref cal, input);
 				output = cal.A.ToString() + cal.ActiveOperator;
 			}
 			catch (DivideByZeroException)
@@ -137,15 +159,25 @@
 	}
 
 	//TODO vyriešiť case keď vynasobime na strasne velke cislo xxe ** 100+ a vymazeme input tak sa nic nedeje a ked adme nulu vysledok je -0!
-	
+
+	/// <summary>
+	/// Check if operator have to be rewritten. If true, rewrite it.
+	/// </summary>
+	private void RewriteOperatorCheck(char operation)
+	{
+		if (cal.CheckOperator()) 
+		{
+			info = "operator changed";
+		}
+	}
+
 	private void AppendOperation(char operation)
 	{
+		RewriteOperatorCheck(operation);
+		cal.ActiveOperator = operation;
+		if (operatorActive) UpdateSign();
 		operatorActive = true;
-		if (!string.IsNullOrEmpty (input))
-		{
-			CheckLastChar(input[input.Length- 1]);
-		}
-		input += operation;
+		UpdateOutput();
 	}
 
 	/// <summary>
@@ -153,10 +185,13 @@
 	/// </summary>
 	private void Clear()
 	{
-		input = string.Empty;
+		input = "0";
 		result = string.Empty;
 		output = string.Empty;
 		cal = new Calcul();
+		fractionsActive = false;
+		operatorActive = false;
+		info = string.Empty;
 	}
 
 	//Funcs for Appending operations onto buttons
@@ -176,6 +211,19 @@
 	private void Div(MouseEventArgs e)
 	{
 		AppendOperation('/');
+	}
+
+	private void InsertDot(MouseEventArgs e)
+	{
+		if (!fractionsActive)
+		{
+			input += ',';
+			fractionsActive = true;
+		}
+		else
+		{
+			info = "fractions already active!";
+		}
 	}
 	// private void BracketL(MouseEventArgs e)
 	// {
@@ -202,22 +250,4 @@
 			output = input.Remove(input.Length - 1);
 		}
 	}
-
-	/// <summary>
-	/// Check if last character was not number or bracket.
-	/// </summary>
-	private bool RewriteOperator(char lastChar)
-	{
-		// return lastChar != 40 && lastChar != 41 && lastChar < 48 || lastChar > 57;
-		return lastChar < 48 || lastChar > 57;
-	}
-
-	/// <summary>
-	/// Check if last character have to be rewritten. If true, rewrite it.
-	/// </summary>
-	private void CheckLastChar(char lastChar)
-	{
-		if (RewriteOperator(lastChar)) { info = "operator changed"; RemoveLastCharacter(input,out input); }
-	}
-
 }

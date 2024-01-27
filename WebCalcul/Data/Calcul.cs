@@ -30,8 +30,13 @@ namespace WebCalcul.Data
 						return a = a / b;
 					}
 					else throw new DivideByZeroException("Division by zero is not allowed.");
-				default: return 0;
+				default: return b;
 			}
+		}
+
+		public bool CheckOperator()
+		{
+			return activeOperator > 0;
 		}
 
 		// Properties
