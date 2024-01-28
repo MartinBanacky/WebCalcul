@@ -56,7 +56,6 @@
 	private string info = string.Empty;
 	private bool operatorActive = false;
 	private bool fractionsActive = false;
-	private bool negativeActive = false;
 	private Calcul cal = new Calcul();
 
 	protected override async Task OnInitializedAsync()
@@ -93,6 +92,7 @@
 	}
 	private void UpdateSign()
 	{
+		info = "Operator has been changed.";
 		output = cal.A.ToString() + cal.ActiveOperator;
 	}
 
@@ -100,6 +100,7 @@
 	{
 		if (operatorActive)
 		{
+			input = string.Empty;
 			operatorActive = false;
 		}
 
@@ -160,20 +161,9 @@
 
 	//TODO vyriešiť case keď vynasobime na strasne velke cislo xxe ** 100+ a vymazeme input tak sa nic nedeje a ked adme nulu vysledok je -0!
 
-	/// <summary>
-	/// Check if operator have to be rewritten. If true, rewrite it.
-	/// </summary>
-	private void RewriteOperatorCheck(char operation)
-	{
-		if (cal.CheckOperator()) 
-		{
-			info = "operator changed";
-		}
-	}
 
 	private void AppendOperation(char operation)
 	{
-		RewriteOperatorCheck(operation);
 		cal.ActiveOperator = operation;
 		if (operatorActive) UpdateSign();
 		operatorActive = true;
