@@ -48,7 +48,9 @@
 
 @code {
 
-
+	//moznosti reakcie vypoctu
+	//ked sa stlaci operator tak sa aplikuje najprv operator na A a B takyto stylom applyOperator(operator) do A sa ulozi 
+	//
 
 	private string input = string.Empty;
 	private string output = string.Empty;
@@ -56,6 +58,7 @@
 	private string info = string.Empty;
 	private bool operatorActive = false;
 	private bool fractionsActive = false;
+	private bool resultIteration = false;
 	private Calcul cal = new Calcul();
 
 	protected override async Task OnInitializedAsync()
@@ -73,7 +76,8 @@
 		}
 		catch (FormatException)
 		{
-			Console.WriteLine($"Unable to parse '{input}'");
+			Clear();
+			output = "Error while parsing expression :" + input;
 			return 0;
 		}
 		return outputDouble;
@@ -85,19 +89,10 @@
 		calcul.A = calcul.ApplyOperand();	
 	}
 
-	private void UpdateOutput()
-	{
-		ExecuteExpression(ref cal, input);
-		output = cal.A.ToString() + cal.ActiveOperator;
-	}
-	private void UpdateSign()
-	{
-		info = "Operator has been changed.";
-		output = cal.A.ToString() + cal.ActiveOperator;
-	}
 
 	private void AppendNumber(double number)
 	{
+		resultIteration = false;
 		if (operatorActive)
 		{
 			input = string.Empty;
@@ -143,20 +138,30 @@
 
 	private void CalculateResult()
 	{
-		if (!string.IsNullOrEmpty(input))
+		// if (!string.IsNullOrEmpty(input))
+		// {
+		try
 		{
-			try
+			if (string.IsNullOrEmpty(input) && !resultIteration) { cal.B = cal.A; resultIteration = true; }
+
+			else if (!resultIteration)
 			{
-				ExecuteExpression(ref cal, input);
-				output = cal.A.ToString() + cal.ActiveOperator;
-			}
-			catch (DivideByZeroException)
-			{
-				Clear();
-				info = "You cannot divide by 0!";
+				resultIteration = true;
+				cal.B = StringToDouble(input);
 			}
 
+			output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '=';
+			cal.ApplyOperand();
+			input = cal.A.ToString();
+
 		}
+		catch (DivideByZeroException)
+		{
+			Clear();
+			info = "You cannot divide by 0!";
+		}
+
+		// }
 	}
 
 	//TODO vyriešiť case keď vynasobime na strasne velke cislo xxe ** 100+ a vymazeme input tak sa nic nedeje a ked adme nulu vysledok je -0!
@@ -164,10 +169,24 @@
 
 	private void AppendOperation(char operation)
 	{
-		cal.ActiveOperator = operation;
-		if (operatorActive) UpdateSign();
-		operatorActive = true;
-		UpdateOutput();
+		if (resultIteration)
+		{
+			output = cal.A.ToString() + operation;
+			operatorActive = true;
+			cal.ActiveOperator = operation;
+			input = string.Empty;
+			resultIteration = false;
+		}
+		else
+		{
+			resultIteration = false;
+			cal.B = StringToDouble(input);
+			cal.ApplyOperand();
+			output = cal.A.ToString() + operation;
+			operatorActive = true;
+			cal.ActiveOperator = operation;
+			input = cal.A.ToString();
+		}
 	}
 
 	/// <summary>
@@ -226,6 +245,11 @@
 
 	private void ClearEnd(MouseEventArgs e)
 	{
+		if (resultIteration)
+		{
+			Clear();
+			return;
+		}
 		RemoveLastCharacter(input, out input);
 	}
 
