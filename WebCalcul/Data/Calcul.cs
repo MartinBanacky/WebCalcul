@@ -24,6 +24,7 @@ namespace WebCalcul.Data
 				case '+': return a = a + b;
 				case '-': return a = a - b;
 				case '*': return a = a * b;
+				case '%': return a = a % b;
 				case '/':
 					if (b != 0 && a != 0)
 					{

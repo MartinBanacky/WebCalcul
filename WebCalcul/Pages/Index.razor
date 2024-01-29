@@ -40,6 +40,7 @@
 <button @onclick="BracketR">)</button> *@
 <button @onclick="ClearEnd">CE</button>
 <button @onclick="InsertDot">,</button>
+@* <button @onclick="Modulo">%</button> *@
 
 
 <p>Result: @result</p>
@@ -47,17 +48,12 @@
 
 
 @code {
-
-	//moznosti reakcie vypoctu
-	//ked sa stlaci operator tak sa aplikuje najprv operator na A a B takyto stylom applyOperator(operator) do A sa ulozi 
-	//
-
 	private string input = string.Empty;
 	private string output = string.Empty;
 	private string result = string.Empty;
 	private string info = string.Empty;
 	private bool operatorActive = false;
-	private bool fractionsActive = false;
+	// private bool fractionsActive = false;
 	private bool resultIteration = false;
 	private Calcul cal = new Calcul();
 
@@ -198,7 +194,6 @@
 		result = string.Empty;
 		output = string.Empty;
 		cal = new Calcul();
-		fractionsActive = false;
 		operatorActive = false;
 		info = string.Empty;
 	}
@@ -221,13 +216,20 @@
 	{
 		AppendOperation('/');
 	}
+	// private void Modulo(MouseEventArgs e)
+	// {
+	// 	AppendOperation('%');
+	// }
+	// private void (MouseEventArgs e)
+	// {
+	// 	AppendOperation('√');
+	// }
 
 	private void InsertDot(MouseEventArgs e)
 	{
-		if (!fractionsActive)
+		if (!input.Contains(','))
 		{
 			input += ',';
-			fractionsActive = true;
 		}
 		else
 		{
@@ -243,6 +245,9 @@
 	// 	AppendOperation(')');
 	// }
 
+	/// <summary>
+	/// This had to be changed from lsat char remove to whole input remove due to complicated logic.. TODO
+	/// </summary>
 	private void ClearEnd(MouseEventArgs e)
 	{
 		if (resultIteration)
@@ -250,7 +255,7 @@
 			Clear();
 			return;
 		}
-		RemoveLastCharacter(input, out input);
+		input = "0";
 	}
 
 	/// <summary>
@@ -264,4 +269,5 @@
 			output = input.Remove(input.Length - 1);
 		}
 	}
+
 }
