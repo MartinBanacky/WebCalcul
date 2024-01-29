@@ -84,5 +84,39 @@ namespace WebCalculTests
 			var calc = new Calcul(5.5d, 0d, '/');
 			calc.ApplyOperand();
 		}
+
+		//unit tests with ApplyPercentageOperand
+
+		[TestMethod]
+		public void ApplyPercentageOperand_Addition_ReturnsCorrectSum()
+		{
+			var calc = new Calcul(600,20, '+');
+			var result = calc.ApplyPercentageOperand();
+			Assert.AreEqual(720, result);
+		}
+
+		[TestMethod]
+		public void ApplyPercentageOperand_Substraction_ReturnsCorrectSum()
+		{
+			var calc = new Calcul(600, 20, '-');
+			var result = calc.ApplyPercentageOperand();
+			Assert.AreEqual(480, result);
+		}
+
+		[TestMethod]
+		public void ApplyPercentageOperand_Multiplication_ReturnsCorrectSum()
+		{
+			var calc = new Calcul(600, 20, '*');
+			var result = calc.ApplyPercentageOperand();
+			Assert.AreEqual(120, result);
+		}
+
+		[TestMethod]
+		public void ApplyPercentageOperand_Division_ReturnsCorrectSum()
+		{
+			var calc = new Calcul(600, 20, '/');
+			var result = calc.ApplyPercentageOperand();
+			Assert.AreEqual(3000, result);
+		}
 	}
 }

@@ -36,11 +36,14 @@
 <button @onclick="Sub">-</button>
 <button @onclick="Pow">*</button>
 <button @onclick="Div">/</button>
-@* <button @onclick="BracketL">(</button>
-<button @onclick="BracketR">)</button> *@
 <button @onclick="ClearEnd">CE</button>
 <button @onclick="InsertDot">,</button>
-@* <button @onclick="Modulo">%</button> *@
+<button @onclick="Percentage">%</button>
+<button @onclick="Root">√</button>
+<button @onclick="MemMinus">M-</button>
+<button @onclick="MemPlus">M+</button>
+<button @onclick="MRC">MRC</button>
+
 
 
 <p>Result: @result</p>
@@ -53,8 +56,9 @@
 	private string result = string.Empty;
 	private string info = string.Empty;
 	private bool operatorActive = false;
-	// private bool fractionsActive = false;
 	private bool resultIteration = false;
+	private bool percentageIteration = false;
+	private bool memoryActive = false;
 	private Calcul cal = new Calcul();
 
 	protected override async Task OnInitializedAsync()
@@ -79,85 +83,53 @@
 		return outputDouble;
 	}
 
-	private void ExecuteExpression(ref Calcul calcul, string inputField)
-	{
-		calcul.B = StringToDouble(input);
-		calcul.A = calcul.ApplyOperand();	
-	}
-
-
 	private void AppendNumber(double number)
 	{
 		resultIteration = false;
-		if (operatorActive)
+		info = string.Empty; //clears info line after user add number into input
+		if (operatorActive || memoryActive)
 		{
 			input = string.Empty;
 			operatorActive = false;
+			percentageIteration = false;
 		}
 
-		// info = string.Empty;
-		// if (!string.IsNullOrEmpty(input) && operatorActive)
-		// {
-		// 	//if output already contain some number we execute math expression
-		// 	if (!string.IsNullOrEmpty(output))
-		// 	{
-		// 		try
-		// 		{
-		// 			ExecuteExpression(ref cal, operatorActive, input);
-
-		// 			cal.ActiveOperator = input[input.Length - 1];
-		// 		}
-		// 		catch (DivideByZeroException)
-		// 		{
-		// 			Clear();
-		// 			info = "You cannot divide by 0!";
-		// 		}
-
-		// 		//TODO vymyslieť prepisovanie operatora a zadať reštrikcie pre hranice čis. datoveho typu double(inak to pada!)
-		// 		cal.ActiveOperator = input[input.Length - 1];
-
-		// 	}
-		// 	else //Here we just rewrite input into output field
-		// 	{	
-		// 		cal.A = StringToDouble(input);
-		// 	}
-
-		// 	UpdateOutput();
-		// 	operatorActive = false;
-		// 	fractionsActive = false;
-		// 	input = string.Empty;
-		// }
 		if (input == "0") input = string.Empty;
 		input += number.ToString();
 	}
 
+	//TODO doplnit case ked nasobim -10 
 
-	private void CalculateResult()
+	//TODO vyriesit prepisovanie infa 
+
+	private void ApplyOperandOfCal(ref Calcul cal)
 	{
-		// if (!string.IsNullOrEmpty(input))
-		// {
 		try
 		{
-			if (string.IsNullOrEmpty(input) && !resultIteration) { cal.B = cal.A; resultIteration = true; }
-
-			else if (!resultIteration)
-			{
-				resultIteration = true;
-				cal.B = StringToDouble(input);
-			}
-
-			output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '=';
 			cal.ApplyOperand();
-			input = cal.A.ToString();
-
 		}
 		catch (DivideByZeroException)
 		{
 			Clear();
 			info = "You cannot divide by 0!";
 		}
+	}
 
-		// }
+	private void CalculateResult()
+	{
+		if (string.IsNullOrEmpty(input) && !resultIteration) { cal.B = cal.A; resultIteration = true; }
+
+		else if (!cal.CheckOperatorActive()) return;
+
+		else if (!resultIteration )
+		{
+			resultIteration = true;
+			cal.B = StringToDouble(input);
+		}
+
+		output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '=';
+		ApplyOperandOfCal(ref cal);
+		input = cal.A.ToString();
 	}
 
 	//TODO vyriešiť case keď vynasobime na strasne velke cislo xxe ** 100+ a vymazeme input tak sa nic nedeje a ked adme nulu vysledok je -0!
@@ -167,22 +139,31 @@
 	{
 		if (resultIteration)
 		{
-			output = cal.A.ToString() + operation;
-			operatorActive = true;
-			cal.ActiveOperator = operation;
+			SetOperatorAndOutput(operation);
+
 			input = string.Empty;
 			resultIteration = false;
 		}
+		else if (operatorActive)
+		{
+			SetOperatorAndOutput(operation);
+		}
 		else
 		{
-			resultIteration = false;
 			cal.B = StringToDouble(input);
-			cal.ApplyOperand();
-			output = cal.A.ToString() + operation;
-			operatorActive = true;
-			cal.ActiveOperator = operation;
+			ApplyOperandOfCal(ref cal);
+			SetOperatorAndOutput(operation);
+
 			input = cal.A.ToString();
+			resultIteration = false;
 		}
+	}
+
+	private void SetOperatorAndOutput(char oper)
+	{
+		cal.ActiveOperator = oper;
+		operatorActive = true;
+		output = cal.A.ToString() + oper;
 	}
 
 	/// <summary>
@@ -195,7 +176,9 @@
 		output = string.Empty;
 		cal = new Calcul();
 		operatorActive = false;
+		percentageIteration = false;
 		info = string.Empty;
+		memoryActive = false;
 	}
 
 	//Funcs for Appending operations onto buttons
@@ -216,14 +199,34 @@
 	{
 		AppendOperation('/');
 	}
-	// private void Modulo(MouseEventArgs e)
-	// {
-	// 	AppendOperation('%');
-	// }
-	// private void (MouseEventArgs e)
-	// {
-	// 	AppendOperation('√');
-	// }
+	private void Percentage(MouseEventArgs e)
+	{
+		if (!cal.CheckOperatorActive())
+		{
+			info = "There is nothing to calculate percentage of!";
+			return;
+		}
+		else
+		{
+			if (!percentageIteration)
+			{
+				cal.B = StringToDouble(input);
+				percentageIteration = true;
+			}
+
+			output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '%';
+			input = cal.ApplyPercentageOperand().ToString();
+			operatorActive = true;
+		}
+	}
+
+	private void Root(MouseEventArgs e)
+	{
+		cal.A = StringToDouble(input);
+		output = '√' + cal.A.ToString();
+		cal.ApplyPercentage();
+		input = cal.A.ToString();
+	}
 
 	private void InsertDot(MouseEventArgs e)
 	{
@@ -236,14 +239,6 @@
 			info = "fractions already active!";
 		}
 	}
-	// private void BracketL(MouseEventArgs e)
-	// {
-	// 	AppendOperation('(');
-	// }
-	// private void BracketR(MouseEventArgs e)
-	// {
-	// 	AppendOperation(')');
-	// }
 
 	/// <summary>
 	/// This had to be changed from lsat char remove to whole input remove due to complicated logic.. TODO
@@ -269,5 +264,23 @@
 			output = input.Remove(input.Length - 1);
 		}
 	}
+	private void MemMinus(MouseEventArgs e)
+	{
+		if (!memoryActive) memoryActive = true;
+		cal.AppendIntoMinMem( StringToDouble(input));
+		info = "value vas added into memory for minus numbers!";
+	}
+	private void MemPlus(MouseEventArgs e)
+	{
+		if (!memoryActive) memoryActive = true;
+		cal.AppendIntoPlusMem( StringToDouble(input));
+		info = "value vas added into memory for minus numbers!";
+	}
+	private void MRC(MouseEventArgs e)
+	{
+		output = cal.ResultFromMemory().ToString();
+		input = cal.A.ToString();
 
+		info = "Result from memory:";
+	}
 }
