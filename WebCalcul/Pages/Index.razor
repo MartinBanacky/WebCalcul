@@ -1,9 +1,15 @@
 ﻿@using WebCalcul.Data
 @page "/"
 
+<style>
+	.calculator-input {
+		text-align: right;
+	}
+</style>
+
 <h3>Calculator</h3>
 
-<input type="text" @bind="input" readonly />
+<input type="text" class="calculator-input" @bind="input" readonly />
 <p>Calculate: @output</p>
 
 @for (int i = 0; i <= 9; i++)
@@ -30,122 +36,175 @@
 <button @onclick="Sub">-</button>
 <button @onclick="Pow">*</button>
 <button @onclick="Div">/</button>
-@* <button @onclick="BracketL">(</button>
-<button @onclick="BracketR">)</button> *@
 <button @onclick="ClearEnd">CE</button>
+<button @onclick="InsertDot">,</button>
+<button @onclick="Percentage">%</button>
+<button @onclick="Root">√</button>
+<button @onclick="MemMinus">M-</button>
+<button @onclick="MemPlus">M+</button>
+<button @onclick="MRC">MRC</button>
+
 
 
 <p>Result: @result</p>
 <p>Info: @info</p>
 
+<div class="calculator">
+	<div class="display">
+		<input type="text" class="calculator-input" @bind="input" readonly />
+	</div>
+	<div class="button-row">
+		<button class="button">MCR</button>
+		<button class="button">M-</button>
+		<button class="button">M+</button>
+		<button class="button operator">/</button>
+		<button class="button operator">%</button>
+
+	</div>
+	<div class="button-row">
+		<button class="button">7</button>
+		<button class="button">8</button>
+		<button class="button">9</button>
+		<button class="button operator">x</button>
+		<button class="button operator">√</button>
+	</div>
+	<div class="button-row">
+		<button class="button">4</button>
+		<button class="button">5</button>
+		<button class="button">6</button>
+		<button class="button operator">+</button>
+		<button class="button operator">C</button>
+	</div>
+	<div class="button-row">
+		<button class="button">1</button>
+		<button class="button">2</button>
+		<button class="button">3</button>
+		<button class="button operator">-</button>
+		<button class="button operator">CE</button>
+	</div>
+	<div class="button-row">
+		<button class="button">0</button>
+		<button class="button operator">.</button>
+		<button class="button operator" >=</button>
+	</div>
+</div>
+
 
 @code {
-
 	private string input = string.Empty;
 	private string output = string.Empty;
 	private string result = string.Empty;
 	private string info = string.Empty;
 	private bool operatorActive = false;
+	private bool resultIteration = false;
+	private bool percentageIteration = false;
+	private bool memoryActive = false;
 	private Calcul cal = new Calcul();
 
-
-	private double StringToDouble(string input)
+	protected override async Task OnInitializedAsync()
 	{
-		double outputDouble = 0;
+		await base.OnInitializedAsync();
+		input = cal.A.ToString();
+	}
+
+	private decimal StringToDecimal(string input)
+	{
+		decimal outputDecimal = 0;
 		try
 		{
-			outputDouble = double.Parse(input);
+			outputDecimal = decimal.Parse(input);
 		}
 		catch (FormatException)
 		{
-			Console.WriteLine($"Unable to parse '{input}'");
+			Clear();
+			output = "Error while parsing expression :" + input;
 			return 0;
 		}
-		return outputDouble;
+		return outputDecimal;
 	}
 
-	private void ExecuteExpression(ref Calcul calcul, bool operatorActiveSign, string inputField)
+	private void AppendNumber(decimal number)
 	{
-		var numBUncut = string.Empty;
-		numBUncut += inputField;
-		//if we do not use button "=", we cut off operand
-		if (operatorActiveSign)
+		resultIteration = false;
+		info = string.Empty; //clears info line after user add number into input
+		if (operatorActive)
 		{
-			numBUncut = numBUncut.Remove(numBUncut.Length - 1);
-		}
-
-		calcul.B = StringToDouble(numBUncut);
-		calcul.A = calcul.ApplyOperand();
-	}
-
-	private void AppendNumber(int number)
-	{
-		info = string.Empty;
-		if (!string.IsNullOrEmpty(input) && operatorActive)
-		{
-			//if output already contain some number we execute math expression
-			if (!string.IsNullOrEmpty(output))
-			{
-				try
-				{
-					ExecuteExpression(ref cal, operatorActive, input);
-
-					cal.ActiveOperator = input[input.Length - 1];
-				}
-				catch (DivideByZeroException)
-				{
-					Clear();
-					info = "You cannot divide by 0!";
-				}
-
-				//TODO vymyslieť prepisovanie operatora a zadať reštrikcie pre hranice čis. datoveho typu double(inak to pada!)
-				cal.ActiveOperator = input[input.Length - 1];
-
-			}
-			else //Here we just rewrite input into output field
-			{	
-				cal.ActiveOperator = input[input.Length - 1];
-				RemoveLastCharacter(input, out input);
-				//set numA
-				cal.A = StringToDouble(input);
-			}
-
-			output = cal.A.ToString() + cal.ActiveOperator;
-			operatorActive = false;
 			input = string.Empty;
+			operatorActive = false;
+			percentageIteration = false;
 		}
+		// if (memoryActive)
+		// {
+
+		// 	return;
+		// }
+
+		if (input == "0") input = string.Empty;
 		input += number.ToString();
 	}
 
-
-	private void CalculateResult()
+	private void ApplyOperandOfCal(ref Calcul cal)
 	{
-		if (!string.IsNullOrEmpty(input))
+		try
 		{
-			try
-			{
-				ExecuteExpression(ref cal, operatorActive, input);
-				output = cal.A.ToString() + cal.ActiveOperator;
-			}
-			catch (DivideByZeroException)
-			{
-				Clear();
-				info = "You cannot divide by 0!";
-			}
-
+			cal.ApplyOperand();
+		}
+		catch (DivideByZeroException)
+		{
+			Clear();
+			info = "You cannot divide by 0!";
 		}
 	}
 
+	private void CalculateResult()
+	{
+		if (string.IsNullOrEmpty(input) && !resultIteration) { cal.B = cal.A; resultIteration = true; }
+
+		else if (!cal.CheckOperatorActive()) return;
+
+		else if (!resultIteration )
+		{
+			resultIteration = true;
+			cal.B = StringToDecimal(input);
+		}
+
+		output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '=';
+		ApplyOperandOfCal(ref cal);
+		input = cal.A.ToString();
+	}
+
 	//TODO vyriešiť case keď vynasobime na strasne velke cislo xxe ** 100+ a vymazeme input tak sa nic nedeje a ked adme nulu vysledok je -0!
-	
+
+
 	private void AppendOperation(char operation)
 	{
-		operatorActive = true;
-		if (!string.IsNullOrEmpty (input))
+		if (resultIteration)
 		{
-			CheckLastChar(input[input.Length- 1]);
+			SetOperatorAndOutput(operation);
+
+			input = string.Empty;
+			resultIteration = false;
 		}
-		input += operation;
+		else if (operatorActive)
+		{
+			SetOperatorAndOutput(operation);
+		}
+		else
+		{
+			cal.B = StringToDecimal(input);
+			ApplyOperandOfCal(ref cal);
+			SetOperatorAndOutput(operation);
+
+			input = cal.A.ToString();
+			resultIteration = false;
+		}
+	}
+
+	private void SetOperatorAndOutput(char oper)
+	{
+		cal.ActiveOperator = oper;
+		operatorActive = true;
+		output = cal.A.ToString() + oper;
 	}
 
 	/// <summary>
@@ -153,10 +212,14 @@
 	/// </summary>
 	private void Clear()
 	{
-		input = string.Empty;
+		input = "0";
 		result = string.Empty;
 		output = string.Empty;
 		cal = new Calcul();
+		operatorActive = false;
+		percentageIteration = false;
+		info = string.Empty;
+		memoryActive = false;
 	}
 
 	//Funcs for Appending operations onto buttons
@@ -177,18 +240,67 @@
 	{
 		AppendOperation('/');
 	}
-	// private void BracketL(MouseEventArgs e)
-	// {
-	// 	AppendOperation('(');
-	// }
-	// private void BracketR(MouseEventArgs e)
-	// {
-	// 	AppendOperation(')');
-	// }
+	private void Percentage(MouseEventArgs e)
+	{
+		if (!cal.CheckOperatorActive())
+		{
+			info = "There is nothing to calculate percentage of!";
+			input = 0.ToString();
+			return;
+		}
+		else
+		{
+			if (!percentageIteration)
+			{
+				cal.B = StringToDecimal(input);
+				percentageIteration = true;
+			}
 
+			output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '%';
+			input = cal.ApplyPercentageOperand().ToString();
+			operatorActive = true;
+		}
+	}
+
+	private void Root(MouseEventArgs e)
+	{
+		cal.A = StringToDecimal(input);
+		output = '√' + cal.A.ToString();
+		try
+		{
+			cal.ApplyPercentage();
+		}
+		catch (OverflowException)
+		{
+			Clear();
+			info = "You cannot square root number lower than 0!";
+		}
+		input = cal.A.ToString();
+	}
+
+	private void InsertDot(MouseEventArgs e)
+	{
+		if (!input.Contains(','))
+		{
+			input += ',';
+		}
+		else
+		{
+			info = "fractions already active!";
+		}
+	}
+
+	/// <summary>
+	/// This had to be changed from lsat char remove to whole input remove due to complicated logic.. TODO
+	/// </summary>
 	private void ClearEnd(MouseEventArgs e)
 	{
-		RemoveLastCharacter(input, out input);
+		if (resultIteration)
+		{
+			Clear();
+			return;
+		}
+		input = "0";
 	}
 
 	/// <summary>
@@ -202,22 +314,29 @@
 			output = input.Remove(input.Length - 1);
 		}
 	}
-
-	/// <summary>
-	/// Check if last character was not number or bracket.
-	/// </summary>
-	private bool RewriteOperator(char lastChar)
+	private void MemMinus(MouseEventArgs e)
 	{
-		// return lastChar != 40 && lastChar != 41 && lastChar < 48 || lastChar > 57;
-		return lastChar < 48 || lastChar > 57;
+		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
+		
+		cal.AppendIntoMinMem(StringToDecimal(input));
+		info = "value vas added into memory for minus numbers!";
+	}
+	private void MemPlus(MouseEventArgs e)
+	{
+		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
+		cal.AppendIntoPlusMem( StringToDecimal(input));
+		info = "value vas added into memory for minus numbers!";
 	}
 
 	/// <summary>
-	/// Check if last character have to be rewritten. If true, rewrite it.
+	/// Doubletap removes memory flag
 	/// </summary>
-	private void CheckLastChar(char lastChar)
+	private void MRC(MouseEventArgs e)
 	{
-		if (RewriteOperator(lastChar)) { info = "operator changed"; RemoveLastCharacter(input,out input); }
-	}
+		if (string.IsNullOrEmpty(input)) { memoryActive = false; return; }
+		output = cal.ResultFromMemory().ToString();
+		input = cal.A.ToString();
 
+		info = "Result from memory:";
+	}
 }
