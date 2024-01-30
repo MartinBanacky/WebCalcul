@@ -1,92 +1,45 @@
 ﻿@using WebCalcul.Data
 @page "/"
 
-<style>
-	.calculator-input {
-		text-align: right;
-	}
-</style>
-
 <h3>Calculator</h3>
 
-<input type="text" class="calculator-input" @bind="input" readonly />
 <p>Calculate: @output</p>
-
-@for (int i = 0; i <= 9; i++)
-{
-    var num = i;
-    if (i == 0)
-    {
-        <br />
-    }
-	if (i == 1)
-	{
-		<br />
-	}
-    <Button @onclick="() => AppendNumber(num)">@num</Button>
-    if (i % 3 == 0)
-    {
-        <br />
-    }
-}
-
-<button @onclick="CalculateResult">=</button>
-<button @onclick="Clear">C</button>
-<button @onclick="Sum">+</button>
-<button @onclick="Sub">-</button>
-<button @onclick="Pow">*</button>
-<button @onclick="Div">/</button>
-<button @onclick="ClearEnd">CE</button>
-<button @onclick="InsertDot">,</button>
-<button @onclick="Percentage">%</button>
-<button @onclick="Root">√</button>
-<button @onclick="MemMinus">M-</button>
-<button @onclick="MemPlus">M+</button>
-<button @onclick="MRC">MRC</button>
-
-
-
-<p>Result: @result</p>
 <p>Info: @info</p>
 
-<div class="calculator">
-	<div class="display">
-		<input type="text" class="calculator-input" @bind="input" readonly />
-	</div>
-	<div class="button-row">
-		<button class="button">MCR</button>
-		<button class="button">M-</button>
-		<button class="button">M+</button>
-		<button class="button operator">/</button>
-		<button class="button operator">%</button>
 
-	</div>
-	<div class="button-row">
-		<button class="button">7</button>
-		<button class="button">8</button>
-		<button class="button">9</button>
-		<button class="button operator">x</button>
-		<button class="button operator">√</button>
-	</div>
-	<div class="button-row">
-		<button class="button">4</button>
-		<button class="button">5</button>
-		<button class="button">6</button>
-		<button class="button operator">+</button>
-		<button class="button operator">C</button>
-	</div>
-	<div class="button-row">
-		<button class="button">1</button>
-		<button class="button">2</button>
-		<button class="button">3</button>
-		<button class="button operator">-</button>
-		<button class="button operator">CE</button>
-	</div>
-	<div class="button-row">
-		<button class="button">0</button>
-		<button class="button operator">.</button>
-		<button class="button operator" >=</button>
-	</div>
+<div class="calculator-grid">
+	<input type="text" class="display-input" @bind="input" readonly />
+
+	<!-- Memory and operations -->
+	<div class="button" @onclick="MRC">MCR</div>
+	<div class="button" @onclick="MemMinus">M-</div>
+	<div class="button" @onclick="MemPlus">M+</div>
+	<div class="button operator" @onclick="Div">/</div>
+	<div class="button operator" @onclick="Percentage">%</div>
+
+
+	<div class="button" @onclick="() => AppendNumber(7)">7</div>
+	<div class="button" @onclick="() => AppendNumber(8)">8</div>
+	<div class="button" @onclick="() => AppendNumber(9)">9</div>
+	<div class="button operator" @onclick="Pow">x</div>
+	<div class="button operator" @onclick="Root">√</div>
+
+	<div class="button" @onclick="() => AppendNumber(4)">4</div>
+	<div class="button" @onclick="() => AppendNumber(5)">5</div>
+	<div class="button" @onclick="() => AppendNumber(6)">6</div>
+	<div class="button operator" @onclick="Sum">+</div>
+	<div class="button operator" @onclick="Clear">C</div>
+
+	<div class="button" @onclick="() => AppendNumber(1)">1</div>
+	<div class="button" @onclick="() => AppendNumber(2)">2</div>
+	<div class="button" @onclick="() => AppendNumber(3)">3</div>
+	<div class="button operator" @onclick="Sub">-</div>
+	<div class="button operator" @onclick="ClearEnd">CE</div>
+
+	<!-- Bottom row -->
+	<div class="button doubled" @onclick="() => AppendNumber(0)">0</div>
+	<div class="button operator" @onclick="InsertDot">.</div>
+	<div class="button operator doubled" @onclick="CalculateResult">=</div>
 </div>
 
 
@@ -317,7 +270,7 @@
 	private void MemMinus(MouseEventArgs e)
 	{
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
-		
+
 		cal.AppendIntoMinMem(StringToDecimal(input));
 		info = "value vas added into memory for minus numbers!";
 	}
@@ -325,7 +278,7 @@
 	{
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
 		cal.AppendIntoPlusMem( StringToDecimal(input));
-		info = "value vas added into memory for minus numbers!";
+		info = "value vas added into memory for plus numbers!";
 	}
 
 	/// <summary>
@@ -333,7 +286,12 @@
 	/// </summary>
 	private void MRC(MouseEventArgs e)
 	{
-		if (string.IsNullOrEmpty(input)) { memoryActive = false; return; }
+		if (e.Detail == 2)
+		{
+			memoryActive = false;	
+			info = "memory cleared!";
+			return;
+		}
 		output = cal.ResultFromMemory().ToString();
 		input = cal.A.ToString();
 
