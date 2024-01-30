@@ -3,11 +3,13 @@
 
 <h3>Calculator</h3>
 
-<p>Calculate: @output</p>
-<p>Info: @info</p>
-
-
 <div class="calculator-grid">
+	<div class="info-display">
+		<div class="info-text">@info</div>
+		<div class="output-text">@output</div>
+
+	</div>
+
 	<input type="text" class="display-input" @bind="input" readonly />
 
 	<!-- Memory and operations -->
@@ -37,9 +39,9 @@
 	<div class="button operator" @onclick="ClearEnd">CE</div>
 
 	<!-- Bottom row -->
-	<div class="button doubled" @onclick="() => AppendNumber(0)">0</div>
+	<div class="button doubled-row" @onclick="() => AppendNumber(0)">0</div>
 	<div class="button operator" @onclick="InsertDot">.</div>
-	<div class="button operator doubled" @onclick="CalculateResult">=</div>
+	<div class="button operator doubled-row" @onclick="CalculateResult">=</div>
 </div>
 
 
