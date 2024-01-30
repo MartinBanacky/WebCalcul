@@ -49,6 +49,41 @@
 <p>Result: @result</p>
 <p>Info: @info</p>
 
+<div class="calculator">
+	<div class="display">
+		<input type="text" class="display-input" readonly />
+	</div>
+	<div class="button-row">
+		<button class="button">C</button>
+		<button class="button">±</button>
+		<button class="button">%</button>
+		<button class="button operator">÷</button>
+	</div>
+	<div class="button-row">
+		<button class="button">7</button>
+		<button class="button">8</button>
+		<button class="button">9</button>
+		<button class="button operator">×</button>
+	</div>
+	<div class="button-row">
+		<button class="button">4</button>
+		<button class="button">5</button>
+		<button class="button">6</button>
+		<button class="button operator">-</button>
+	</div>
+	<div class="button-row">
+		<button class="button">1</button>
+		<button class="button">2</button>
+		<button class="button">3</button>
+		<button class="button operator">+</button>
+	</div>
+	<div class="button-row">
+		<button class="button decimal">0</button>
+		<button class="button">.</button>
+		<button class="button operator">=</button>
+	</div>
+</div>
+
 
 @code {
 	private string input = string.Empty;
@@ -67,12 +102,12 @@
 		input = cal.A.ToString();
 	}
 
-	private double StringToDouble(string input)
+	private decimal StringToDecimal(string input)
 	{
-		double outputDouble = 0;
+		decimal outputDecimal = 0;
 		try
 		{
-			outputDouble = double.Parse(input);
+			outputDecimal = decimal.Parse(input);
 		}
 		catch (FormatException)
 		{
@@ -80,10 +115,10 @@
 			output = "Error while parsing expression :" + input;
 			return 0;
 		}
-		return outputDouble;
+		return outputDecimal;
 	}
 
-	private void AppendNumber(double number)
+	private void AppendNumber(decimal number)
 	{
 		resultIteration = false;
 		info = string.Empty; //clears info line after user add number into input
@@ -125,7 +160,7 @@
 		else if (!resultIteration )
 		{
 			resultIteration = true;
-			cal.B = StringToDouble(input);
+			cal.B = StringToDecimal(input);
 		}
 
 		output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '=';
@@ -151,7 +186,7 @@
 		}
 		else
 		{
-			cal.B = StringToDouble(input);
+			cal.B = StringToDecimal(input);
 			ApplyOperandOfCal(ref cal);
 			SetOperatorAndOutput(operation);
 
@@ -212,7 +247,7 @@
 		{
 			if (!percentageIteration)
 			{
-				cal.B = StringToDouble(input);
+				cal.B = StringToDecimal(input);
 				percentageIteration = true;
 			}
 
@@ -224,9 +259,17 @@
 
 	private void Root(MouseEventArgs e)
 	{
-		cal.A = StringToDouble(input);
+		cal.A = StringToDecimal(input);
 		output = '√' + cal.A.ToString();
-		cal.ApplyPercentage();
+		try
+		{
+			cal.ApplyPercentage();
+		}
+		catch (OverflowException)
+		{
+			Clear();
+			info = "You cannot square root number lower than 0!";
+		}
 		input = cal.A.ToString();
 	}
 
@@ -270,13 +313,13 @@
 	{
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
 		
-		cal.AppendIntoMinMem( StringToDouble(input));
+		cal.AppendIntoMinMem(StringToDecimal(input));
 		info = "value vas added into memory for minus numbers!";
 	}
 	private void MemPlus(MouseEventArgs e)
 	{
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
-		cal.AppendIntoPlusMem( StringToDouble(input));
+		cal.AppendIntoPlusMem( StringToDecimal(input));
 		info = "value vas added into memory for minus numbers!";
 	}
 

@@ -5,60 +5,60 @@ namespace WebCalcul.Data
 {
     public class Calcul
     {
-        private double a;
-        private double b;
+        private decimal a;
+        private decimal b;
         private char activeOperator;
-		private List<double> MinMemStore;
-		private List<double> PlusMemStore;
+		private List<decimal> MinMemStore;
+		private List<decimal> PlusMemStore;
 
 		public Calcul(){
-			MinMemStore = new List<double>();
-			PlusMemStore = new List<double>();
+			MinMemStore = new List<decimal>();
+			PlusMemStore = new List<decimal>();
 		}
-		public Calcul(double numA, double numB, char oper)
+		public Calcul(decimal numA, decimal numB, char oper)
         {
             a = numA;
             b = numB;
             activeOperator = oper;
-			MinMemStore = new List<double>();
-			PlusMemStore = new List<double>();
+			MinMemStore = new List<decimal>();
+			PlusMemStore = new List<decimal>();
 		}
 
-		public double ApplyOperand()
+		public decimal ApplyOperand()
 		{
 			switch (activeOperator)
 			{
-				case '+': return a = Math.Round(a + b, 20);
-				case '*': return a = Math.Round(a * b, 20);
-				case '-': return a = Math.Round(a - b, 20);
+				case '+': return a = a + b;
+				case '*': return a = a * b;
+				case '-': return a = a - b;
 				case '/':
 					if (b != 0 && a != 0)
 					{
-						return a = Math.Round(a / b, 20);
+						return a = a / b;
 					}
 					else throw new DivideByZeroException("Division by zero is not allowed.");
-				default: return a = Math.Round(a + b, 20);
+				default: return a = a + b;
 			}
 		}
 
-		public double ApplyPercentageOperand()
+		public decimal ApplyPercentageOperand()
 		{
 			switch (activeOperator)
 			{
 				case '+':
 					A = a * (b + 100) / 100;
-					B = 0;
-					activeOperator = '\0';
+					//B = 0;
+					//activeOperator = '\0';
 					return A;
 				case '-':
 					A = a * (100 - b) / 100;
-					B = 0;
-					activeOperator = '\0';
+					//B = 0;
+					//activeOperator = '\0';
 					return A;
 				case '*':
 					A = a * b / 100;
-					B = 0;
-					activeOperator = '\0';
+					//B = 0;
+					//activeOperator = '\0';
 					return A;
 				case '/':
 					A = a / (b / 100);
@@ -68,30 +68,48 @@ namespace WebCalcul.Data
 			}
 		}
 
-		public bool AppendIntoMinMem(double num)
+		public bool AppendIntoMinMem(decimal num)
 		{
 			MinMemStore.Add(num);
 			return true;
 		}
 
-		public bool AppendIntoPlusMem(double num)
+		public bool AppendIntoPlusMem(decimal num)
 		{
 			PlusMemStore.Add(num); 
 			return true;
 		}
 
-		public double ResultFromMemory()
+		public decimal ResultFromMemory()
 		{
-			double sumPlus = PlusMemStore.Sum();
-			double sumMinus = MinMemStore.Sum();
+			decimal sumPlus = PlusMemStore.Sum();
+			decimal sumMinus = MinMemStore.Sum();
 			B = 0;
 			ActiveOperator = '\0';
-			return A = Math.Round(sumPlus - sumMinus, 14);
+			return A = sumPlus - sumMinus;
+		}
+
+		public static decimal Sqrt(decimal x, decimal epsilon = 0.0M)
+		{
+			if (x < 0)
+			{
+				throw new OverflowException("Cannot calculate square root from a negative number");
+			}
+
+			decimal current = (decimal)Math.Sqrt((double)x), previous;
+			do
+			{
+				previous = current;
+				if (previous == 0.0M) return 0;
+				current = (previous + x / previous) / 2;
+			}
+			while (Math.Abs(previous - current) > epsilon);
+			return current;
 		}
 
 		public void ApplyPercentage()
 		{
-			A = Math.Sqrt(A);
+			A = Sqrt(A);
 		}
 
 		public bool CheckOperatorActive()
@@ -100,13 +118,13 @@ namespace WebCalcul.Data
 		}
 
 		// Properties
-		public double A
+		public decimal A
 		{
 			get { return a; }
 			set { a = value; }
 		}
 
-		public double B
+		public decimal B
 		{
 			get { return b; }
 			set { b = value; }
@@ -118,11 +136,11 @@ namespace WebCalcul.Data
 			set { activeOperator = value; }
 		}
 
-		public double MinMemStoreLast()
+		public decimal MinMemStoreLast()
 		{
 			return MinMemStore.Last();
 		}
-		public double PlusMemStoreLast()
+		public decimal PlusMemStoreLast()
 		{
 			return PlusMemStore.Last();
 		}

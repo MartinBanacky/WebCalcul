@@ -46,42 +46,42 @@ namespace WebCalculTests
 		}
 
 		[TestMethod]
-		public void ApplyOperand_DoubleAddition_ReturnsCorrectSum()
+		public void ApplyOperand_DecimalAddition_ReturnsCorrectSum()
 		{
-			var calc = new Calcul(5.5d, 3.3d, '+');
+			var calc = new Calcul(5.5m, 3.3m, '+');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(8.8d, result, 0.0001d);
+			Assert.AreEqual(8.8m, result);
 		}
 
 		[TestMethod]
-		public void ApplyOperand_DoubleSubtraction_ReturnsCorrectDifference()
+		public void ApplyOperand_DecimalSubtraction_ReturnsCorrectDifference()
 		{
-			var calc = new Calcul(5.5d, 3.3d, '-');
+			var calc = new Calcul(5.5m, 3.3m, '-');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(2.2d, result, 0.0001d); 
+			Assert.AreEqual(2.2m, result); 
 		}
 
 		[TestMethod]
-		public void ApplyOperand_DoubleMultiplication_ReturnsCorrectProduct()
+		public void ApplyOperand_DecimalMultiplication_ReturnsCorrectProduct()
 		{
-			var calc = new Calcul(5.5d, 2d, '*');
+			var calc = new Calcul(5.5m, 2m, '*');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(11d, result, 0.0001d);
+			Assert.AreEqual(11m, result);
 		}
 
 		[TestMethod]
-		public void ApplyOperand_DoubleDivision_ReturnsCorrectQuotient()
+		public void ApplyOperand_DecimalDivision_ReturnsCorrectQuotient()
 		{
-			var calc = new Calcul(5.5d, 2d, '/');
+			var calc = new Calcul(5.5m, 2m, '/');
 			var result = calc.ApplyOperand();
-			Assert.AreEqual(2.75d, result, 0.0001d); 
+			Assert.AreEqual(2.75m, result); 
 		}
 
 		[TestMethod]
 		[ExpectedException(typeof(DivideByZeroException))]
-		public void ApplyOperand_DoubleDivisionByZero_ThrowsException()
+		public void ApplyOperand_DecimalDivisionByZero_ThrowsException()
 		{
-			var calc = new Calcul(5.5d, 0d, '/');
+			var calc = new Calcul(5.5m, 0m, '/');
 			calc.ApplyOperand();
 		}
 
@@ -123,39 +123,39 @@ namespace WebCalculTests
 		public void AppendIntoMinMem_AppendsValue_ReturnsTrue()
 		{
 			var calc = new Calcul();
-			var result = calc.AppendIntoMinMem(5.5);
+			var result = calc.AppendIntoMinMem(5.5m);
 			Assert.IsTrue(result);
-			Assert.AreEqual(5.5, calc.MinMemStoreLast());
+			Assert.AreEqual(5.5m, calc.MinMemStoreLast());
 		}
 
 		[TestMethod]
 		public void AppendIntoPlusMem_AppendsValue_ReturnsTrue()
 		{
 			var calc = new Calcul();
-			var result = calc.AppendIntoPlusMem(3.3);
+			var result = calc.AppendIntoPlusMem(3.3m);
 			Assert.IsTrue(result);
-			Assert.AreEqual(3.3, calc.PlusMemStoreLast());
+			Assert.AreEqual(3.3m, calc.PlusMemStoreLast());
 		}
 
 		[TestMethod]
 		public void ResultFromMemory_CalculatesCorrectResult()
 		{
 			var calc = new Calcul();
-			calc.AppendIntoPlusMem(10.0);
-			calc.AppendIntoPlusMem(20.0);
-			calc.AppendIntoMinMem(5.0);
-			calc.AppendIntoMinMem(3.0);
+			calc.AppendIntoPlusMem(10.0m);
+			calc.AppendIntoPlusMem(20.0m);
+			calc.AppendIntoMinMem(5.0m);
+			calc.AppendIntoMinMem(3.0m);
 			var result = calc.ResultFromMemory();
-			Assert.AreEqual(22.0, result);
+			Assert.AreEqual(22.0m, result);
 		}
 		[TestMethod]
 		public void ResultFromMemory_CalculatesCorrectResultFractions()
 		{
 			var calc = new Calcul();
-			calc.AppendIntoPlusMem(55.33);
-			calc.AppendIntoMinMem(55.0);
+			calc.AppendIntoPlusMem(55.33m);
+			calc.AppendIntoMinMem(55.0m);
 			var result = calc.ResultFromMemory();
-			Assert.AreEqual(0.33, result);
+			Assert.AreEqual(0.33m, result);
 		}
 	}
 }
