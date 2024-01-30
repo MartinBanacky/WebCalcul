@@ -28,16 +28,16 @@ namespace WebCalcul.Data
 		{
 			switch (activeOperator)
 			{
-				case '+': return a += b;
-				case '-': return a -= b;
-				case '*': return a *= b;
+				case '+': return a = Math.Round(a + b, 20);
+				case '*': return a = Math.Round(a * b, 20);
+				case '-': return a = Math.Round(a - b, 20);
 				case '/':
 					if (b != 0 && a != 0)
 					{
-						return a /= b;
+						return a = Math.Round(a / b, 20);
 					}
 					else throw new DivideByZeroException("Division by zero is not allowed.");
-				default: return a += b;
+				default: return a = Math.Round(a + b, 20);
 			}
 		}
 
@@ -86,7 +86,7 @@ namespace WebCalcul.Data
 			double sumMinus = MinMemStore.Sum();
 			B = 0;
 			ActiveOperator = '\0';
-			return A = sumPlus - sumMinus;
+			return A = Math.Round(sumPlus - sumMinus, 14);
 		}
 
 		public void ApplyPercentage()
@@ -117,5 +117,14 @@ namespace WebCalcul.Data
 			get { return activeOperator; }
 			set { activeOperator = value; }
 		}
-    }
+
+		public double MinMemStoreLast()
+		{
+			return MinMemStore.Last();
+		}
+		public double PlusMemStoreLast()
+		{
+			return PlusMemStore.Last();
+		}
+	}
 }

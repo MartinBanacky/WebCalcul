@@ -118,5 +118,44 @@ namespace WebCalculTests
 			var result = calc.ApplyPercentageOperand();
 			Assert.AreEqual(3000, result);
 		}
+
+		[TestMethod]
+		public void AppendIntoMinMem_AppendsValue_ReturnsTrue()
+		{
+			var calc = new Calcul();
+			var result = calc.AppendIntoMinMem(5.5);
+			Assert.IsTrue(result);
+			Assert.AreEqual(5.5, calc.MinMemStoreLast());
+		}
+
+		[TestMethod]
+		public void AppendIntoPlusMem_AppendsValue_ReturnsTrue()
+		{
+			var calc = new Calcul();
+			var result = calc.AppendIntoPlusMem(3.3);
+			Assert.IsTrue(result);
+			Assert.AreEqual(3.3, calc.PlusMemStoreLast());
+		}
+
+		[TestMethod]
+		public void ResultFromMemory_CalculatesCorrectResult()
+		{
+			var calc = new Calcul();
+			calc.AppendIntoPlusMem(10.0);
+			calc.AppendIntoPlusMem(20.0);
+			calc.AppendIntoMinMem(5.0);
+			calc.AppendIntoMinMem(3.0);
+			var result = calc.ResultFromMemory();
+			Assert.AreEqual(22.0, result);
+		}
+		[TestMethod]
+		public void ResultFromMemory_CalculatesCorrectResultFractions()
+		{
+			var calc = new Calcul();
+			calc.AppendIntoPlusMem(55.33);
+			calc.AppendIntoMinMem(55.0);
+			var result = calc.ResultFromMemory();
+			Assert.AreEqual(0.33, result);
+		}
 	}
 }

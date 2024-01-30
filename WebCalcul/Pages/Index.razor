@@ -87,20 +87,21 @@
 	{
 		resultIteration = false;
 		info = string.Empty; //clears info line after user add number into input
-		if (operatorActive || memoryActive)
+		if (operatorActive)
 		{
 			input = string.Empty;
 			operatorActive = false;
 			percentageIteration = false;
 		}
+		// if (memoryActive)
+		// {
+
+		// 	return;
+		// }
 
 		if (input == "0") input = string.Empty;
 		input += number.ToString();
 	}
-
-	//TODO doplnit case ked nasobim -10 
-
-	//TODO vyriesit prepisovanie infa 
 
 	private void ApplyOperandOfCal(ref Calcul cal)
 	{
@@ -204,6 +205,7 @@
 		if (!cal.CheckOperatorActive())
 		{
 			info = "There is nothing to calculate percentage of!";
+			input = 0.ToString();
 			return;
 		}
 		else
@@ -266,18 +268,24 @@
 	}
 	private void MemMinus(MouseEventArgs e)
 	{
-		if (!memoryActive) memoryActive = true;
+		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
+		
 		cal.AppendIntoMinMem( StringToDouble(input));
 		info = "value vas added into memory for minus numbers!";
 	}
 	private void MemPlus(MouseEventArgs e)
 	{
-		if (!memoryActive) memoryActive = true;
+		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
 		cal.AppendIntoPlusMem( StringToDouble(input));
 		info = "value vas added into memory for minus numbers!";
 	}
+
+	/// <summary>
+	/// Doubletap removes memory flag
+	/// </summary>
 	private void MRC(MouseEventArgs e)
 	{
+		if (string.IsNullOrEmpty(input)) { memoryActive = false; return; }
 		output = cal.ResultFromMemory().ToString();
 		input = cal.A.ToString();
 
