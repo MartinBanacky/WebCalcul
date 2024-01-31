@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
+﻿using Microsoft.AspNetCore.Mvc.ActionConstraints;
 
 namespace WebCalcul.Data
 {
@@ -28,16 +27,16 @@ namespace WebCalcul.Data
 		{
 			switch (activeOperator)
 			{
-				case '+': return a = a + b;
-				case '*': return a = a * b;
-				case '-': return a = a - b;
+				case '+': return a += b;
+				case '*': return a *= b;
+				case '-': return a -= b;
 				case '/':
 					if (b != 0 && a != 0)
 					{
-						return a = a / b;
+						return a /= b;
 					}
 					else throw new DivideByZeroException("Division by zero is not allowed.");
-				default: return a = a + b;
+				default: return a += b;
 			}
 		}
 
@@ -47,18 +46,12 @@ namespace WebCalcul.Data
 			{
 				case '+':
 					A = a * (b + 100) / 100;
-					//B = 0;
-					//activeOperator = '\0';
 					return A;
 				case '-':
 					A = a * (100 - b) / 100;
-					//B = 0;
-					//activeOperator = '\0';
 					return A;
 				case '*':
 					A = a * b / 100;
-					//B = 0;
-					//activeOperator = '\0';
 					return A;
 				case '/':
 					A = a / (b / 100);
@@ -134,6 +127,22 @@ namespace WebCalcul.Data
 		{
 			get { return activeOperator; }
 			set { activeOperator = value; }
+		}
+
+		public bool AnyMinMemStore()
+		{
+			return MinMemStore.Any();
+		}
+
+		public bool AnyPlusMemStore()
+		{
+			return PlusMemStore.Any();
+		}
+
+		public void RemoveMemory()
+		{
+			MinMemStore = new List<decimal>();
+			PlusMemStore = new List<decimal>();
 		}
 
 		public decimal MinMemStoreLast()

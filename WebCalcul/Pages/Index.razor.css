@@ -1,56 +1,85 @@
-﻿
-.calculator {
-    max-width: 320px;
-    margin: 20px auto;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    background-color: #f8f9fa;
+﻿.app-name {
+    text-align:center;
 }
 
-.display {
-    padding: 10px;
-    background-color: #e9ecef;
-    border-bottom: 1px solid #ced4da;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+.calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: minmax(60px, auto) repeat(5, 1fr);
+    grid-gap: 10px;
+    max-width: max-content;
+    min-width: 540px;
+    margin: 20px auto;
+    border: 2px solid #213555;
+    border-radius: 16px;
+    background-color: #f8f9fa;
+    padding: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
+.info-display {
+    grid-column: span 5;
+    border-bottom: 2px solid #213555;
+    padding: 10px;
+}
+
+.info-text {
+    font-size: 1em;
+}
+
+.output-text {
+    font-size: 1.5em;
+    text-align: right;
+}
+
 
 .display-input {
-    width: 100%;
+    grid-column: 1 / -1;
+    padding: 10px;
+    margin: 0;
     border: none;
-    background: none;
+    background-color: #4F709C;
     text-align: right;
-    font-size: 2em;
+    font-size: 1.8em;
     outline: none;
-}
-
-.button-row {
-    display: flex;
+    color: white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-radius: 12px;
+    overflow: auto;
 }
 
 .button {
-    flex: 1;
     padding: 20px;
-    border: none;
-    background-color: #dee2e6;
+    background-color: #F5EFE7;
     font-size: 1.5em;
     cursor: pointer;
-    outline: none;
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    user-select: none;
 }
+    .button:active {
+        background-color: #E2D2C4;
+    }
 
-    .button.double {
-        flex: 2;
+    .button.doubled-row {
+        grid-column: span 2;
     }
 
     .button.operator {
-        background-color: #6c757d;
-        color: white;
+        background-color: #D8C4B6;
+        color: black;
+    }
+        .button.operator:active {
+            background-color: #C3B0A1;
+        }
+    .button.memory-empty {
+        background-color: #FFCCCC; 
     }
 
-    .button:not(:last-child) {
-        border-right: 1px solid #ced4da;
+    .button.memory-filled {
+        background-color: #CCFFCC; 
     }
-
-.button-row:not(:last-child) .button {
-    border-bottom: 1px solid #ced4da;
-}
