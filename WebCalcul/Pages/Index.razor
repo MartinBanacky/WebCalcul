@@ -1,7 +1,7 @@
 ﻿@using WebCalcul.Data
 @page "/"
 
-<h3>Calculator</h3>
+<h1>WebCalcul App</h1>
 
 <div class="calculator-grid">
 	<div class="info-display">
@@ -13,7 +13,7 @@
 	<input type="text" class="display-input" @bind="input" readonly />
 
 	<!-- Memory and operations -->
-	<div class="button" @onclick="MRC">MCR</div>
+	<div class="button @MemoryButtonClass" @onclick="MRC">MCR</div>
 	<div class="button" @onclick="MemMinus">M-</div>
 	<div class="button" @onclick="MemPlus">M+</div>
 	<div class="button operator" @onclick="Div">/</div>
@@ -55,6 +55,11 @@
 	private bool percentageIteration = false;
 	private bool memoryActive = false;
 	private Calcul cal = new Calcul();
+
+	/// <summary>
+	/// Choose which color to use on button
+	/// </summary>
+	private string MemoryButtonClass => cal.AnyMinMemStore() || cal.AnyPlusMemStore() ? "memory-filled" : "memory-empty";
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -128,9 +133,6 @@
 		input = cal.A.ToString();
 	}
 
-	//TODO vyriešiť case keď vynasobime na strasne velke cislo xxe ** 100+ a vymazeme input tak sa nic nedeje a ked adme nulu vysledok je -0!
-
-
 	private void AppendOperation(char operation)
 	{
 		if (resultIteration)
@@ -177,7 +179,6 @@
 		memoryActive = false;
 	}
 
-	//Funcs for Appending operations onto buttons
 
 	private void Sum(MouseEventArgs e)
 	{
@@ -224,6 +225,7 @@
 		try
 		{
 			cal.ApplyPercentage();
+			operatorActive = true;
 		}
 		catch (OverflowException)
 		{
@@ -274,13 +276,13 @@
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
 
 		cal.AppendIntoMinMem(StringToDecimal(input));
-		info = "value vas added into memory for minus numbers!";
+		info = "Value vas added into memory for minus numbers!";
 	}
 	private void MemPlus(MouseEventArgs e)
 	{
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
 		cal.AppendIntoPlusMem( StringToDecimal(input));
-		info = "value vas added into memory for plus numbers!";
+		info = "Value vas added into memory for plus numbers!";
 	}
 
 	/// <summary>
@@ -290,8 +292,9 @@
 	{
 		if (e.Detail == 2)
 		{
-			memoryActive = false;	
-			info = "memory cleared!";
+			memoryActive = false;
+			cal.RemoveMemory();
+			info = "Memory cleared!";
 			return;
 		}
 		output = cal.ResultFromMemory().ToString();

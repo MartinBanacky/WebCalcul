@@ -55,6 +55,7 @@
     border-radius: 12px;
     justify-content: center;
     transition: background-color 0.2s ease;
+    user-select: none;
 }
     .button:active {
         background-color: #E2D2C4;
@@ -71,3 +72,10 @@
         .button.operator:active {
             background-color: #C3B0A1;
         }
+    .button.memory-empty {
+        background-color: #FFCCCC; 
+    }
+
+    .button.memory-filled {
+        background-color: #CCFFCC; 
+    }

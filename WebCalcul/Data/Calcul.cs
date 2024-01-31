@@ -135,6 +135,22 @@ namespace WebCalcul.Data
 			set { activeOperator = value; }
 		}
 
+		public bool AnyMinMemStore()
+		{
+			return MinMemStore.Any();
+		}
+
+		public bool AnyPlusMemStore()
+		{
+			return PlusMemStore.Any();
+		}
+
+		public void RemoveMemory()
+		{
+			MinMemStore = new List<decimal>();
+			PlusMemStore = new List<decimal>();
+		}
+
 		public decimal MinMemStoreLast()
 		{
 			return MinMemStore.Last();

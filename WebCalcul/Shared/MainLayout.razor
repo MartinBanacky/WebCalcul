@@ -1,11 +1,15 @@
 ﻿@inherits LayoutComponentBase
-
+<head>
+    <link href="css/layout.css" rel="stylesheet">
+</head>
 <PageTitle>WebCalcul</PageTitle>
 
 <div class="page">
     <main>
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <button @onclick="ToggleModal" style="background:none; border:none; padding:0; cursor:pointer;">
+                <img src="Images/info1.svg" alt="Click for more info"/>
+            </button>
         </div>
 
         <article class="content px-4">
@@ -13,3 +17,22 @@
         </article>
     </main>
 </div>
+
+@@if (showModal)
+{
+    <div class="modal" style="display: block;">
+        <div class="modal-content">
+            <span class="close" @onclick="ToggleModal">close</span>
+            <img src="Images/info2.png" alt="CalPhoto">
+        </div>
+    </div>
+}
+
+@code {
+    private bool showModal = false;
+
+    private void ToggleModal()
+    {
+        showModal = !showModal;
+    }
+}
