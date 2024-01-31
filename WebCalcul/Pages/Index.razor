@@ -93,11 +93,6 @@
 			operatorActive = false;
 			percentageIteration = false;
 		}
-		// if (memoryActive)
-		// {
-
-		// 	return;
-		// }
 
 		if (input == "0") input = string.Empty;
 		input += number.ToString();
@@ -311,18 +306,24 @@
 			return;
 		}
 
-		try
+		if (cal.AnyMinMemStore() || cal.AnyMinMemStore())
 		{
-			output = cal.ResultFromMemory().ToString();
+			try
+			{
+				output = cal.ResultFromMemory().ToString();
+			}
+			catch (OverflowException)
+			{
+				Clear();
+				info = "You cannot square root number lower than 0!";
+			}
+			input = cal.A.ToString();
+			info = "Result from memory:";
 		}
-		catch (OverflowException)
+		else
 		{
-			Clear();
-			info = "You cannot square root number lower than 0!";
+			info = "Memory is empty!";
 		}
-		
-		input = cal.A.ToString();
 
-		info = "Result from memory:";
 	}
 }
