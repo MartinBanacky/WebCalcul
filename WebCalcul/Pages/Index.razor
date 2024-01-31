@@ -1,7 +1,7 @@
 ﻿@using WebCalcul.Data
 @page "/"
 
-<h1>WebCalcul App</h1>
+<h1 class="app-name">WebCalcul App</h1>
 
 <div class="calculator-grid">
 	<div class="info-display">
@@ -114,6 +114,11 @@
 			Clear();
 			info = "You cannot divide by 0!";
 		}
+		catch (OverflowException)
+		{
+			Clear();
+			info = "You exceed range of decimal data type!";
+		}
 	}
 
 	private void CalculateResult()
@@ -213,7 +218,15 @@
 			}
 
 			output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '%';
-			input = cal.ApplyPercentageOperand().ToString();
+			try
+			{
+				input = cal.ApplyPercentageOperand().ToString();
+			}
+			catch (OverflowException)
+			{
+				Clear();
+				info = "You exceed range of decimal data type!";
+			}
 			operatorActive = true;
 		}
 	}
@@ -297,7 +310,17 @@
 			info = "Memory cleared!";
 			return;
 		}
-		output = cal.ResultFromMemory().ToString();
+
+		try
+		{
+			output = cal.ResultFromMemory().ToString();
+		}
+		catch (OverflowException)
+		{
+			Clear();
+			info = "You cannot square root number lower than 0!";
+		}
+		
 		input = cal.A.ToString();
 
 		info = "Result from memory:";

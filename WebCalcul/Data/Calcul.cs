@@ -46,18 +46,12 @@ namespace WebCalcul.Data
 			{
 				case '+':
 					A = a * (b + 100) / 100;
-					//B = 0;
-					//activeOperator = '\0';
 					return A;
 				case '-':
 					A = a * (100 - b) / 100;
-					//B = 0;
-					//activeOperator = '\0';
 					return A;
 				case '*':
 					A = a * b / 100;
-					//B = 0;
-					//activeOperator = '\0';
 					return A;
 				case '/':
 					A = a / (b / 100);

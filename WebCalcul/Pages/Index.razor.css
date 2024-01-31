@@ -1,4 +1,8 @@
-﻿.calculator-grid {
+﻿.app-name {
+    text-align:center;
+}
+
+.calculator-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: minmax(60px, auto) repeat(5, 1fr);

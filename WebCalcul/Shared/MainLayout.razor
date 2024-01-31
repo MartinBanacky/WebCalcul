@@ -6,19 +6,17 @@
 
 <div class="page">
     <main>
-        <div class="top-row px-4">
-            <button @onclick="ToggleModal" style="background:none; border:none; padding:0; cursor:pointer;">
-                <img src="Images/info1.svg" alt="Click for more info"/>
-            </button>
-        </div>
-
+        <button @onclick="ToggleModal" style="background:none; border:none; padding:0; cursor:pointer;float: right;">
+            <img src="Images/info1.svg" alt="Click for more info" />
+        </button>
         <article class="content px-4">
+
             @Body
         </article>
     </main>
 </div>
 
-@@if (showModal)
+@if (showModal)
 {
     <div class="modal" style="display: block;">
         <div class="modal-content">
