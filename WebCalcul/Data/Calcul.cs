@@ -73,6 +73,10 @@ namespace WebCalcul.Data
 			return true;
 		}
 
+		/// <summary>
+		/// Func return result from M- and M+ sum.
+		/// </summary>
+		/// <returns></returns>
 		public decimal ResultFromMemory()
 		{
 			decimal sumPlus = PlusMemStore.Sum();
@@ -82,6 +86,9 @@ namespace WebCalcul.Data
 			return A = sumPlus - sumMinus;
 		}
 
+		/// <summary>
+		/// Func make square root from given number.
+		/// </summary>
 		public static decimal Sqrt(decimal x, decimal epsilon = 0.0M)
 		{
 			if (x < 0)

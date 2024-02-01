@@ -46,28 +46,63 @@
 
 
 @code {
+
+	//private variables
+	/// <summary>
+	/// variable provide value for GUI input field
+	/// </summary>
 	private string input = string.Empty;
+	/// <summary>
+	/// variable provide value for GUI output field
+	/// </summary>
 	private string output = string.Empty;
+	/// <summary>
+	/// variable provide value for GUI info field
+	/// </summary>
 	private string info = string.Empty;
+	/// <summary>
+	/// On if operator is activeated
+	/// </summary>
 	private bool operatorActive = false;
+	/// <summary>
+	/// sign for iteration after "=" is pressed
+	/// </summary>
 	private bool resultIteration = false;
+	/// <summary>
+	/// sign for iteration after "%" is pressed
+	/// </summary>
 	private bool percentageIteration = false;
+	/// <summary>
+	/// sign for activated memory
+	/// </summary>
 	private bool memoryActive = false;
+	/// <summary>
+	/// sign for rewriting input field
+	/// </summary>
+	private bool rewriteInput = true;
+	/// <summary>
+	/// variable that execute expressions
+	/// </summary>
 	private Calcul cal = new Calcul();
 
-	private bool rewriteInput = true;
 
 	/// <summary>
 	/// Choose which color to use on button
 	/// </summary>
 	private string MemoryButtonClass => cal.AnyMinMemStore() || cal.AnyPlusMemStore() ? "memory-filled" : "memory-empty";
 
+	/// <summary>
+	/// Func rewrite input varaible to 0
+	/// </summary>
 	protected override async Task OnInitializedAsync()
 	{
 		await base.OnInitializedAsync();
 		input = cal.A.ToString();
 	}
 
+	/// <summary>
+	/// Function change string to decimal
+	/// </summary>
 	private decimal StringToDecimal(string input)
 	{
 		decimal outputDecimal = 0;
@@ -84,21 +119,33 @@
 		return outputDecimal;
 	}
 
+	/// <summary>
+	/// Func for rewriting output field.
+	/// </summary>
 	private void RewriteOutput()
 	{
 		output = cal.A.ToString() + cal.ActiveOperator.ToString();
 	}
+	/// <summary>
+	/// Func for rewriting input field.
+	/// </summary>
 	private void RewriteInputToAValue()
 	{
 		input = cal.A.ToString();
 	}
 
+	/// <summary>
+	/// Func for rewriting output field - for "=" version.
+	/// </summary>
 	private void RewriteOutputResult()
 	{
 		if (!cal.CheckOperatorActive()) output = cal.A.ToString();
 		else output = cal.A.ToString() + cal.ActiveOperator.ToString() + cal.B.ToString() + '=';
 	}
 
+	/// <summary>
+	/// Func append number into input field.
+	/// </summary>
 	private void AppendNumber(decimal number)
 	{
 		//if we add number operator is no longer active so next time we hit operator button
@@ -115,6 +162,10 @@
 		input += number.ToString();
 	}
 
+	/// <summary>
+	/// Func append operation into output field and change value in calculator class.
+	/// Funck applies operator if needed.
+	/// </summary>
 	private void AppendOperation(char operation)
 	{
 		if (operation == '=')
@@ -163,7 +214,9 @@
 		}
 	}
 
-
+	/// <summary>
+	/// Func apply active operand and catch potentiall erros
+	/// </summary>
 	private void ApplyOperandOfCal(ref Calcul cal)
 	{
 		try
@@ -198,7 +251,7 @@
 		cal = new Calcul();
 	}
 
-
+	//Adding functionality to buttons
 	private void Sum(MouseEventArgs e)
 	{
 		AppendOperation('+');
@@ -216,6 +269,9 @@
 		AppendOperation('/');
 	}
 
+	/// <summary>
+	/// Func implement "%" button functionality
+	/// </summary>
 	private void Percentage(MouseEventArgs e)
 	{
 		if (!cal.CheckOperatorActive())
@@ -242,10 +298,14 @@
 				Clear();
 				info = "You exceed range of decimal data type!";
 			}
-			 operatorActive = true;
+			operatorActive = true;
 		}
 	}
 
+	/// <summary>
+	/// Funck implement square root button functionality
+	/// </summary>
+	/// <param name="e"></param>
 	private void Root(MouseEventArgs e)
 	{
 		cal.A = StringToDecimal(input);
@@ -264,6 +324,11 @@
 		input = cal.A.ToString();
 	}
 
+
+	/// <summary>
+	/// Func add dot into input, cast info if already dot involved
+	/// </summary>
+	/// <param name="e"></param>
 	private void InsertDot(MouseEventArgs e)
 	{
 		if (operatorActive) input = "0"; rewriteInput = false; operatorActive = false;
@@ -278,29 +343,25 @@
 	}
 
 	/// <summary>
-	/// This had to be changed from lsat char remove to whole input remove due to complicated logic.. TODO
+	/// Func set input to "0"
 	/// </summary>
 	private void ClearEntryClick(MouseEventArgs e)
 	{
 		input = "0";
 	}
 
+	/// <summary>
+	/// Func to set input empty.
+	/// </summary>
 	private void ClearEntry()
 	{
 		input = string.Empty;
 	}
 
 	/// <summary>
-	/// Remove last character from input
+	/// Func add value from input into desired memory
 	/// </summary>
-	private void RemoveLastCharacter(string input, out string output)
-	{
-		output = string.Empty;
-		if (!string.IsNullOrEmpty(input))
-		{
-			output = input.Remove(input.Length - 1);
-		}
-	}
+	/// <param name="e"></param>
 	private void MemMinus(MouseEventArgs e)
 	{
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
@@ -309,6 +370,11 @@
 		info = "Value vas added into memory for minus numbers!";
 		rewriteInput = true;
 	}
+
+	/// <summary>
+	/// Func add value from input into desired memory
+	/// </summary>
+	/// <param name="e"></param>
 	private void MemPlus(MouseEventArgs e)
 	{
 		if (!memoryActive || !operatorActive) { memoryActive = true; operatorActive = true; }
@@ -318,7 +384,8 @@
 	}
 
 	/// <summary>
-	/// Doubletap removes memory flag
+	/// Func calculate sum of M- and M+ and rewrite input and output field. 
+	/// Doubletap removes memory flag and clears memory.
 	/// </summary>
 	private void MRC(MouseEventArgs e)
 	{
