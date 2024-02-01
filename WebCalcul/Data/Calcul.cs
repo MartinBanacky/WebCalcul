@@ -28,7 +28,7 @@ namespace WebCalcul.Data
 			switch (activeOperator)
 			{
 				case '+': return a += b;
-				case '*': return a *= b;
+				case 'x': return a *= b;
 				case '-': return a -= b;
 				case '/':
 					if (b != 0 && a != 0)
@@ -50,7 +50,7 @@ namespace WebCalcul.Data
 				case '-':
 					A = a * (100 - b) / 100;
 					return A;
-				case '*':
+				case 'x':
 					A = a * b / 100;
 					return A;
 				case '/':
@@ -100,7 +100,7 @@ namespace WebCalcul.Data
 			return current;
 		}
 
-		public void ApplyPercentage()
+		public void ApplyRoot()
 		{
 			A = Sqrt(A);
 		}
