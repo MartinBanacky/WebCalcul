@@ -14,10 +14,10 @@
 /* Modal Content */
 .modal-content {
     background-color: #fefefe;
-    margin: 2% auto;
+    margin: 1% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 60%; 
+    width: 57%; 
     min-width: 540px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 }
@@ -28,6 +28,7 @@
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
+    text-align: right;
 }
 
     .close:hover,
