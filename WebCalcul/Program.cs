@@ -4,12 +4,17 @@ using WebCalcul.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var connectionString = builder.Configuration.GetConnectionString("FirebirdDb");
+
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+//TODO
+// builder.Services.AddDbContext<YourDbContext>(options => options.UseFirebird(connectionString));
 
 var app = builder.Build();
 
@@ -35,3 +40,4 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 app.Run();
+ 
