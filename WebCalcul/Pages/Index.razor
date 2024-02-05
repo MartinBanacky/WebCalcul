@@ -1,4 +1,5 @@
 ﻿@using WebCalcul.Data
+@inject WebCalculDbContext dbContext
 @page "/"
 
 <h1 class="app-name">WebCalcul App</h1>
@@ -100,6 +101,23 @@
 		input = cal.A.ToString();
 	}
 
+	private void SaveState(Action operation)
+	{
+		var state = new CalculState();
+
+		state.SaveStateBeforeExec(cal, operatorActive, resultIteration, percentageIteration, memoryActive, rewriteInput);
+
+		operation();
+
+		state.UpdateStateResultAfterExec(cal.A);
+
+		dbContext.CalculStates.Add(state);
+		dbContext.SaveChanges();
+	}
+
+
+
+
 	/// <summary>
 	/// Function change string to decimal
 	/// </summary>
@@ -174,14 +192,18 @@
 			{
 				cal.A = StringToDecimal(input); //this must be here for iter calculation
 				RewriteOutputResult();
-				ApplyOperandOfCal(ref cal);
+
+				ApplyOperandOfCal(cal);
+
 				RewriteInputToAValue();
 				return;
 			}
 			cal.B = StringToDecimal(input);
 			resultIteration = true;
 			RewriteOutputResult();
-			ApplyOperandOfCal(ref cal);
+
+			ApplyOperandOfCal(cal);
+
 			if (!cal.CheckOperatorActive()) output = cal.A.ToString();
 			RewriteInputToAValue();
 		}
@@ -203,7 +225,9 @@
 
 			if (!resultIteration)
 			{
-				ApplyOperandOfCal(ref cal);
+
+				ApplyOperandOfCal(cal);
+
 			}
 
 			cal.ActiveOperator = operation;
@@ -217,11 +241,12 @@
 	/// <summary>
 	/// Func apply active operand and catch potentiall erros
 	/// </summary>
-	private void ApplyOperandOfCal(ref Calcul cal)
+	private void ApplyOperandOfCal(Calcul cal)
 	{
 		try
 		{
-			cal.ApplyOperand();
+			// cal.ApplyOperand();
+			SaveState(() => cal.ApplyOperand()); //check if it works without ref TODO! //INJECT
 		}
 		catch (DivideByZeroException)
 		{
@@ -291,7 +316,9 @@
 			output = cal.A.ToString() + cal.ActiveOperator + cal.B.ToString() + '%';
 			try
 			{
-				input = cal.ApplyPercentageOperand().ToString();
+
+				SaveState(() => cal.ApplyPercentageOperand()); //INJECT
+				input = cal.A.ToString();
 			}
 			catch (OverflowException)
 			{
@@ -312,7 +339,7 @@
 		output = '√' + cal.A.ToString();
 		try
 		{
-			cal.ApplyRoot();
+			SaveState(() => cal.ApplyRoot()); //INJECT
 			operatorActive = true;
 			rewriteInput = true;
 		}
@@ -418,5 +445,6 @@
 			info = "Memory is empty!";
 		}
 
+	}
 	}
 }

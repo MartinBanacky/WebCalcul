@@ -3,20 +3,37 @@
 	public class CalculState
 	{
 
-		private bool operatorActiveSign;
+		public int Id { get; set; } //PK
+		public decimal NumberA { get; set; }
+		public decimal NumberB { get; set; }
+		public char Operator { get; set; }
+		public decimal Result { get; set; }
 
-		private bool resultIterationSign;
+		public bool OperatorActiveSign { get; set; } = false;
+		public bool ResultIterationSign { get; set; } = false;
+		public bool PercentageIterationSign { get; set; } = false;
+		public bool MemoryActiveSign { get; set; } = false;
+		public bool RewriteInputSign { get; set; } = true;
 
-		private bool percentageIterationSign;
+		public CalculState()
+		{
+		}
 
-		private bool memoryActiveSign;
+		public void SaveStateBeforeExec(Calcul calcul, bool OperActiveSign, bool ResultIterSign, bool PercentIterSign, bool MemActiveSign, bool RwrtInputSign)
+		{
+			NumberA = calcul.A;
+			NumberB = calcul.B;
+			Operator = calcul.ActiveOperator;
+			OperatorActiveSign = OperActiveSign;
+			ResultIterationSign = ResultIterSign;
+			PercentageIterationSign = PercentIterSign;
+			MemoryActiveSign = MemActiveSign;
+			RewriteInputSign = RwrtInputSign;
+		}
 
-		private bool rewriteInputSign;
-
-		private decimal numA;
-
-		private decimal numB;
-		
-		private char oeprator;
+		public void UpdateStateResultAfterExec(decimal result)
+		{
+			Result = result;	
+		}
 	}
 }
