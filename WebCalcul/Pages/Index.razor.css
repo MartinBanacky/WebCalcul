@@ -2,6 +2,11 @@
     text-align:center;
 }
 
+.page-grid {
+    display: grid;
+    justify-items: center;
+}
+
 .calculator-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -14,8 +19,12 @@
     border-radius: 16px;
     background-color: #f8f9fa;
     padding: 5px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
+
+.box-shadow {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}    
+
 
 .info-display {
     grid-column: span 5;
@@ -82,4 +91,29 @@
 
     .button.memory-filled {
         background-color: #CCFFCC; 
+    }
+
+.history-list {
+    margin-top: 20px;
+    align-items: center;
+}
+
+.history-item {
+    padding: 8px;
+    text-align: center
+}
+
+
+.button-delete-history {
+    padding: 10px;
+    background-color: #F5EFE7;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 2px solid #213555;
+    border-radius: 16px;
+    max-width: 140px;   
+}
+    .button-delete-history:active {
+        background-color: #E2D2C4;
     }
