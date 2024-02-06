@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("FirebirdDb");
 
-builder.Services.AddDbContext<WebCalculDbContext>(options =>
+builder.Services.AddDbContextFactory<WebCalculDbContext>(options =>
 	options.UseFirebird(builder.Configuration.GetConnectionString("FirebirdDb")));
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -18,8 +18,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-//TODO
-// builder.Services.AddDbContext<YourDbContext>(options => options.UseFirebird(connectionString));
+builder.Services.AddScoped<HistoryService>(); //DI of service that provides values from db table
 
 var app = builder.Build();
 
@@ -36,7 +35,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions()
 	.AddSupportedUICultures(new[] { "en-US", "cz-CZ", "sk-SK" }));
 
 app.UseHttpsRedirection();
-
+	
 app.UseStaticFiles();
 
 app.UseRouting();

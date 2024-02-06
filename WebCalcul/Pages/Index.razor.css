@@ -83,3 +83,12 @@
     .button.memory-filled {
         background-color: #CCFFCC; 
     }
+
+.history-list {
+    margin-top: 20px;
+}
+
+.history-item {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}

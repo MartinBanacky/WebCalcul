@@ -24,7 +24,7 @@ namespace WebCalculTests
 		[TestMethod]
 		public void ApplyOperand_Multiplication_ReturnsCorrectProduct()
 		{
-			var calc = new Calcul(5, 3, '*');
+			var calc = new Calcul(5, 3, 'x');
 			var result = calc.ApplyOperand();
 			Assert.AreEqual(15, result);
 		}
@@ -64,7 +64,7 @@ namespace WebCalculTests
 		[TestMethod]
 		public void ApplyOperand_DecimalMultiplication_ReturnsCorrectProduct()
 		{
-			var calc = new Calcul(5.5m, 2m, '*');
+			var calc = new Calcul(5.5m, 2m, 'x');
 			var result = calc.ApplyOperand();
 			Assert.AreEqual(11m, result);
 		}
@@ -106,7 +106,7 @@ namespace WebCalculTests
 		[TestMethod]
 		public void ApplyPercentageOperand_Multiplication_ReturnsCorrectSum()
 		{
-			var calc = new Calcul(600, 20, '*');
+			var calc = new Calcul(600, 20, 'x');
 			var result = calc.ApplyPercentageOperand();
 			Assert.AreEqual(120, result);
 		}

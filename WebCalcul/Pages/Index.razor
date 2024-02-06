@@ -1,5 +1,6 @@
 ﻿@using WebCalcul.Data
 @inject WebCalculDbContext dbContext
+@inject HistoryService HistoryService
 @page "/"
 
 <h1 class="app-name">WebCalcul App</h1>
@@ -45,6 +46,30 @@
 	<div class="button operator doubled-row" @onclick="() => AppendOperation('=')">=</div>
 </div>
 
+<div class="history-grid">
+	@if (history.Count > 0)
+	{
+		@foreach (var item in history)
+		{
+			<div class="history-item">
+				@if (item.PercentageIterationSign)
+				{
+					@($"{item.NumberA} {item.Operator} {item.NumberB}% = {item.Result}")
+				}
+				else
+				{
+					@($"{item.NumberA} {item.Operator} {item.NumberB} = {item.Result}")
+				}
+			</div>
+		}
+	}
+	else
+	{
+		<div>No history available.</div>
+	}
+</div>
+<button @onclick="DeleteAllHistory">Delete History</button>
+
 
 @code {
 
@@ -85,7 +110,7 @@
 	/// variable that execute expressions
 	/// </summary>
 	private Calcul cal = new Calcul();
-
+	private List<CalculState> history = new List<CalculState>();
 
 	/// <summary>
 	/// Choose which color to use on button
@@ -99,9 +124,16 @@
 	{
 		await base.OnInitializedAsync();
 		input = cal.A.ToString();
+		history = await HistoryService.GetHistoryAsync();
 	}
 
-	private void SaveState(Action operation)
+	private async Task RefreshHistoryGrid()
+	{
+		history = await HistoryService.GetHistoryAsync();
+		StateHasChanged(); 
+	}
+
+	private async void SaveState(Action operation)
 	{
 		var state = new CalculState();
 
@@ -111,8 +143,24 @@
 
 		state.UpdateStateResultAfterExec(cal.A);
 
-		dbContext.CalculStates.Add(state);
-		dbContext.SaveChanges();
+		try
+		{
+			dbContext.CalculStates.Add(state);
+			dbContext.SaveChanges();
+
+			await RefreshHistoryGrid();
+		}
+		catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
+		{
+			Console.WriteLine($"An error occurred: {dbEx.InnerException?.Message}");
+			throw; 
+		}
+	}
+
+	private async Task DeleteAllHistory()
+	{
+		await HistoryService.DeleteAllCalculStatesAsync();
+		await RefreshHistoryGrid();
 	}
 
 
@@ -211,6 +259,8 @@
 		//if operator is active than rewrite it
 		else if (operatorActive && !resultIteration)
 		{
+			rewriteInput = true;
+			percentageIteration = false;
 			cal.ActiveOperator = operation;
 			RewriteOutput();
 			return;
@@ -220,6 +270,7 @@
 		{
 			operatorActive = true;
 			rewriteInput = true;
+			percentageIteration = false;
 
 			cal.B = StringToDecimal(input);
 
@@ -326,6 +377,7 @@
 				info = "You exceed range of decimal data type!";
 			}
 			operatorActive = true;
+			//rewriteInput = true;
 		}
 	}
 
@@ -445,6 +497,5 @@
 			info = "Memory is empty!";
 		}
 
-	}
 	}
 }
