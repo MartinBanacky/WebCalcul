@@ -5,70 +5,81 @@
 
 <h1 class="app-name">WebCalcul App</h1>
 
-<div class="calculator-grid">
-	<div class="info-display">
-		<div class="info-text">@info</div>
-		<div class="output-text">@output</div>
+<div class="page-grid">
+	<div class="calculator-grid box-shadow">
+		<div class="info-display">
+			<div class="info-text">@info</div>
+			<div class="output-text">@output</div>
 
+		</div>
+
+		<input type="text" class="display-input" @bind="input" readonly />
+
+		<!-- Memory and operations -->
+		<div class="button @MemoryButtonClass" @onclick="MRC">MCR</div>
+		<div class="button" @onclick="MemMinus">M-</div>
+		<div class="button" @onclick="MemPlus">M+</div>
+		<div class="button operator" @onclick="() => AppendOperation('/')">/</div>
+		<div class="button operator" @onclick="Percentage">%</div>
+
+
+		<div class="button" @onclick="() => AppendNumber(7)">7</div>
+		<div class="button" @onclick="() => AppendNumber(8)">8</div>
+		<div class="button" @onclick="() => AppendNumber(9)">9</div>
+		<div class="button operator" @onclick="() => AppendOperation('x')">x</div>
+		<div class="button operator" @onclick="Root">√</div>
+		<div class="button" @onclick="() => AppendNumber(4)">4</div>
+		<div class="button" @onclick="() => AppendNumber(5)">5</div>
+		<div class="button" @onclick="() => AppendNumber(6)">6</div>
+		<div class="button operator" @onclick="() => AppendOperation('+')">+</div>
+		<div class="button operator" @onclick="Clear">C</div>
+
+		<div class="button" @onclick="() => AppendNumber(1)">1</div>
+		<div class="button" @onclick="() => AppendNumber(2)">2</div>
+		<div class="button" @onclick="() => AppendNumber(3)">3</div>
+		<div class="button operator" @onclick="() => AppendOperation('-')">-</div>
+		<div class="button operator" @onclick="ClearEntryClick">CE</div>
+
+		<!-- Bottom row -->
+		<div class="button doubled-row" @onclick="() => AppendNumber(0)">0</div>
+		<div class="button operator" @onclick="InsertDot">.</div>
+		<div class="button operator doubled-row" @onclick="() => AppendOperation('=')">=</div>
 	</div>
 
-	<input type="text" class="display-input" @bind="input" readonly />
+	<button class="button-delete-history box-shadow" @onclick="DeleteAllHistory">Delete History</button>
 
-	<!-- Memory and operations -->
-	<div class="button @MemoryButtonClass" @onclick="MRC">MCR</div>
-	<div class="button" @onclick="MemMinus">M-</div>
-	<div class="button" @onclick="MemPlus">M+</div>
-	<div class="button operator" @onclick="() => AppendOperation('/')">/</div>
-	<div class="button operator" @onclick="Percentage">%</div>
-
-
-	<div class="button" @onclick="() => AppendNumber(7)">7</div>
-	<div class="button" @onclick="() => AppendNumber(8)">8</div>
-	<div class="button" @onclick="() => AppendNumber(9)">9</div>
-	<div class="button operator" @onclick="() => AppendOperation('x')">x</div>
-	<div class="button operator" @onclick="Root">√</div>
-
-	<div class="button" @onclick="() => AppendNumber(4)">4</div>
-	<div class="button" @onclick="() => AppendNumber(5)">5</div>
-	<div class="button" @onclick="() => AppendNumber(6)">6</div>
-	<div class="button operator" @onclick="() => AppendOperation('+')">+</div>
-	<div class="button operator" @onclick="Clear">C</div>
-
-	<div class="button" @onclick="() => AppendNumber(1)">1</div>
-	<div class="button" @onclick="() => AppendNumber(2)">2</div>
-	<div class="button" @onclick="() => AppendNumber(3)">3</div>
-	<div class="button operator" @onclick="() => AppendOperation('-')">-</div>
-	<div class="button operator" @onclick="ClearEntryClick">CE</div>
-
-	<!-- Bottom row -->
-	<div class="button doubled-row" @onclick="() => AppendNumber(0)">0</div>
-	<div class="button operator" @onclick="InsertDot">.</div>
-	<div class="button operator doubled-row" @onclick="() => AppendOperation('=')">=</div>
-</div>
-
-<div class="history-grid">
-	@if (history.Count > 0)
-	{
-		@foreach (var item in history)
+	<div class="history-list">
+		@if (history.Count > 0)
 		{
-			<div class="history-item">
-				@if (item.PercentageIterationSign)
-				{
-					@($"{item.NumberA} {item.Operator} {item.NumberB}% = {item.Result}")
-				}
-				else
-				{
-					@($"{item.NumberA} {item.Operator} {item.NumberB} = {item.Result}")
-				}
-			</div>
+			@foreach (var item in history)
+			{
+				<div class="history-item">
+					@if (item.SquareRootSign)
+					{
+						@($"√{item.NumberA} = {item.Result}")
+					}
+					else if (item.PercentageIterationSign)
+					{
+						@($"{item.NumberA} {item.Operator} {item.NumberB}% = {item.Result}")
+					}
+					else if (item.Operator == '\0')
+					{
+						@($"{item.NumberB} = {item.Result}")
+					}
+					else
+					{
+						@($"{item.NumberA} {item.Operator} {item.NumberB} = {item.Result}")
+					}
+				</div>
+			}
 		}
-	}
-	else
-	{
-		<div>No history available.</div>
-	}
+		else
+		{
+			<div>No history available.</div>
+		}
+	</div>
 </div>
-<button @onclick="DeleteAllHistory">Delete History</button>
+
 
 
 @code {
@@ -107,6 +118,10 @@
 	/// </summary>
 	private bool rewriteInput = true;
 	/// <summary>
+	/// sign for active state of square root calcualtions
+	/// </summary>
+	private bool SqrtActive = false;
+	/// <summary>
 	/// variable that execute expressions
 	/// </summary>
 	private Calcul cal = new Calcul();
@@ -137,7 +152,7 @@
 	{
 		var state = new CalculState();
 
-		state.SaveStateBeforeExec(cal, operatorActive, resultIteration, percentageIteration, memoryActive, rewriteInput);
+		state.SaveStateBeforeExec(cal, operatorActive, resultIteration, percentageIteration, memoryActive, rewriteInput, SqrtActive);
 
 		operation();
 
@@ -217,6 +232,7 @@
 		//if we add number operator is no longer active so next time we hit operator button
 		// it wouldn't cast rewrite of operator but execute computation
 		operatorActive = false;
+		SqrtActive = false;
 
 		if (rewriteInput)
 		{
@@ -236,6 +252,16 @@
 	{
 		if (operation == '=')
 		{
+			if (percentageIteration)
+			{
+				Percentage();
+				return;
+			}
+			else if (SqrtActive)
+			{
+				Root();
+				return;
+			}
 			if (resultIteration)
 			{
 				cal.A = StringToDecimal(input); //this must be here for iter calculation
@@ -246,6 +272,7 @@
 				RewriteInputToAValue();
 				return;
 			}
+			SqrtActive = false;
 			cal.B = StringToDecimal(input);
 			resultIteration = true;
 			RewriteOutputResult();
@@ -324,6 +351,7 @@
 		resultIteration = false;
 		percentageIteration = false;
 		memoryActive = false;
+		SqrtActive = false;
 		cal = new Calcul();
 	}
 
@@ -348,7 +376,7 @@
 	/// <summary>
 	/// Func implement "%" button functionality
 	/// </summary>
-	private void Percentage(MouseEventArgs e)
+	private void Percentage()
 	{
 		if (!cal.CheckOperatorActive())
 		{
@@ -377,7 +405,8 @@
 				info = "You exceed range of decimal data type!";
 			}
 			operatorActive = true;
-			//rewriteInput = true;
+
+			rewriteInput = true;
 		}
 	}
 
@@ -385,15 +414,21 @@
 	/// Funck implement square root button functionality
 	/// </summary>
 	/// <param name="e"></param>
-	private void Root(MouseEventArgs e)
+	private void Root()
 	{
+		// cal.A = StringToDecimal(input);
 		cal.A = StringToDecimal(input);
-		output = '√' + cal.A.ToString();
+
 		try
 		{
+			SqrtActive = true;
+			output = '√' + cal.A.ToString() ;
 			SaveState(() => cal.ApplyRoot()); //INJECT
-			operatorActive = true;
+
+			operatorActive = false;
 			rewriteInput = true;
+			percentageIteration = false;
+
 		}
 		catch (OverflowException)
 		{

@@ -25,7 +25,8 @@ namespace WebCalcul.Migrations
                     ResultIterationSign = table.Column<bool>(type: "BOOLEAN", nullable: false),
                     PercentageIterationSign = table.Column<bool>(type: "BOOLEAN", nullable: false),
                     MemoryActiveSign = table.Column<bool>(type: "BOOLEAN", nullable: false),
-                    RewriteInputSign = table.Column<bool>(type: "BOOLEAN", nullable: false)
+                    RewriteInputSign = table.Column<bool>(type: "BOOLEAN", nullable: false),
+                    SquareRootSign = table.Column<bool>(type: "BOOLEAN", nullable: false)
                 },
                 constraints: table =>
                 {

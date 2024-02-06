@@ -14,12 +14,13 @@
 		public bool PercentageIterationSign { get; set; } = false;
 		public bool MemoryActiveSign { get; set; } = false;
 		public bool RewriteInputSign { get; set; } = true;
+		public bool SquareRootSign { get; set; } = false;
 
 		public CalculState()
 		{
 		}
 
-		public void SaveStateBeforeExec(Calcul calcul, bool OperActiveSign, bool ResultIterSign, bool PercentIterSign, bool MemActiveSign, bool RwrtInputSign)
+		public void SaveStateBeforeExec(Calcul calcul, bool OperActiveSign, bool ResultIterSign, bool PercentIterSign, bool MemActiveSign, bool RwrtInputSign, bool SqrtSign)
 		{
 			NumberA = calcul.A;
 			NumberB = calcul.B;
@@ -29,6 +30,7 @@
 			PercentageIterationSign = PercentIterSign;
 			MemoryActiveSign = MemActiveSign;
 			RewriteInputSign = RwrtInputSign;
+			SquareRootSign = SqrtSign;
 		}
 
 		public void UpdateStateResultAfterExec(decimal result)

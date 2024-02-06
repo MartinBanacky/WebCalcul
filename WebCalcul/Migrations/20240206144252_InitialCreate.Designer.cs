@@ -11,7 +11,7 @@ using WebCalcul.Data;
 namespace WebCalcul.Migrations
 {
     [DbContext(typeof(WebCalculDbContext))]
-    [Migration("20240206090635_InitialCreate")]
+    [Migration("20240206144252_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -56,6 +56,9 @@ namespace WebCalcul.Migrations
                         .HasColumnType("BOOLEAN");
 
                     b.Property<bool>("RewriteInputSign")
+                        .HasColumnType("BOOLEAN");
+
+                    b.Property<bool>("SquareRootSign")
                         .HasColumnType("BOOLEAN");
 
                     b.HasKey("Id");

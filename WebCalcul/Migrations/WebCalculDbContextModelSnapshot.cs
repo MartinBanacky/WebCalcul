@@ -55,6 +55,9 @@ namespace WebCalcul.Migrations
                     b.Property<bool>("RewriteInputSign")
                         .HasColumnType("BOOLEAN");
 
+                    b.Property<bool>("SquareRootSign")
+                        .HasColumnType("BOOLEAN");
+
                     b.HasKey("Id");
 
                     b.ToTable("CalculStates");
