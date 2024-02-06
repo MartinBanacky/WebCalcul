@@ -154,7 +154,15 @@
 
 		state.SaveStateBeforeExec(cal, operatorActive, resultIteration, percentageIteration, memoryActive, rewriteInput, SqrtActive);
 
-		operation();
+		try
+		{
+			operation();
+		}
+		catch (Exception)
+		{
+			Clear();
+			info = "Math or Syntax Error!";
+		}
 
 		state.UpdateStateResultAfterExec(cal.A);
 
