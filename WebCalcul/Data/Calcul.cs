@@ -25,6 +25,8 @@ namespace WebCalcul.Data
 
 		public decimal ApplyOperand()
 		{
+			if (activeOperator == '\0') return a = b;
+
 			switch (activeOperator)
 			{
 				case '+': return a += b;
@@ -101,7 +103,7 @@ namespace WebCalcul.Data
 
 		public void ApplyRoot()
 		{
-			A = Sqrt(A);
+			B = Sqrt(B);
 		}
 
 		public bool CheckOperatorActive()

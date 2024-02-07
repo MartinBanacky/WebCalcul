@@ -56,7 +56,7 @@
 				<div class="history-item">
 					@if (item.SquareRootSign)
 					{
-						@($"√{item.NumberA} = {item.Result}")
+						@($"√{item.NumberB} = {item.Result}")
 					}
 					else if (item.PercentageIterationSign)
 					{
@@ -148,35 +148,53 @@
 		StateHasChanged(); 
 	}
 
-	private async void SaveState(Action operation)
+	private async void SaveStateA(Action operation)
 	{
 		var state = new CalculState();
 
-		state.SaveStateBeforeExec(cal, operatorActive, resultIteration, percentageIteration, memoryActive, rewriteInput, SqrtActive);
-
 		try
 		{
+			state.SaveStateBeforeExec(cal, operatorActive, resultIteration, percentageIteration, memoryActive, rewriteInput, SqrtActive);
+
 			operation();
-		}
-		catch (Exception)
-		{
-			Clear();
-			info = "Math or Syntax Error!";
-		}
 
-		state.UpdateStateResultAfterExec(cal.A);
+			state.UpdateStateResultAfterExec(cal.A);
 
-		try
-		{
 			dbContext.CalculStates.Add(state);
 			dbContext.SaveChanges();
 
 			await RefreshHistoryGrid();
 		}
-		catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx)
+		catch (Exception)
 		{
-			Console.WriteLine($"An error occurred: {dbEx.InnerException?.Message}");
-			throw; 
+			Clear();
+			info = "Math or Syntax Error!";
+
+		}
+	}
+
+	private async void SaveStateB(Action operation)
+	{
+		var state = new CalculState();
+
+		try
+		{
+			state.SaveStateBeforeExec(cal, operatorActive, resultIteration, percentageIteration, memoryActive, rewriteInput, SqrtActive);
+
+			operation();
+
+			state.UpdateStateResultAfterExec(cal.B);
+
+			dbContext.CalculStates.Add(state);
+			dbContext.SaveChanges();
+
+			await RefreshHistoryGrid();
+		}
+		catch (Exception)
+		{
+			Clear();
+			info = "Math or Syntax Error!";
+
 		}
 	}
 
@@ -265,13 +283,14 @@
 				Percentage();
 				return;
 			}
-			else if (SqrtActive)
-			{
-				Root();
-				return;
-			}
+			// else if (SqrtActive)
+			// {
+			// 	Root();
+			// 	return;
+			// }
 			if (resultIteration)
 			{
+				SqrtActive = false;
 				cal.A = StringToDecimal(input); //this must be here for iter calculation
 				RewriteOutputResult();
 
@@ -306,6 +325,7 @@
 			operatorActive = true;
 			rewriteInput = true;
 			percentageIteration = false;
+			SqrtActive = false;
 
 			cal.B = StringToDecimal(input);
 
@@ -332,7 +352,7 @@
 		try
 		{
 			// cal.ApplyOperand();
-			SaveState(() => cal.ApplyOperand()); //check if it works without ref TODO! //INJECT
+			SaveStateA(() => cal.ApplyOperand()); //check if it works without ref TODO! //INJECT
 		}
 		catch (DivideByZeroException)
 		{
@@ -389,7 +409,6 @@
 		if (!cal.CheckOperatorActive())
 		{
 			info = "There is nothing to calculate percentage of!";
-			input = "0";
 			return;
 		}
 		else
@@ -404,7 +423,7 @@
 			try
 			{
 
-				SaveState(() => cal.ApplyPercentageOperand()); //INJECT
+				SaveStateA(() => cal.ApplyPercentageOperand()); //INJECT
 				input = cal.A.ToString();
 			}
 			catch (OverflowException)
@@ -424,16 +443,26 @@
 	/// <param name="e"></param>
 	private void Root()
 	{
-		// cal.A = StringToDecimal(input);
-		cal.A = StringToDecimal(input);
+
+		if (resultIteration)
+		{
+			var temp = cal.A;
+			cal.A = cal.B;
+			cal.B = temp;
+		}
+
+		cal.B = StringToDecimal(input);
 
 		try
 		{
 			SqrtActive = true;
-			output = '√' + cal.A.ToString() ;
-			SaveState(() => cal.ApplyRoot()); //INJECT
 
-			operatorActive = false;
+			output = resultIteration || !operatorActive
+			? $"√{cal.B}"
+			: $"{cal.A}{cal.ActiveOperator}√{cal.B}";
+			
+			SaveStateB(() => cal.ApplyRoot());
+
 			rewriteInput = true;
 			percentageIteration = false;
 
@@ -443,7 +472,18 @@
 			Clear();
 			info = "You cannot square root number lower than 0!";
 		}
-		input = cal.A.ToString();
+
+		if (resultIteration)
+		{
+			var temp = cal.A;
+			cal.A = cal.B;
+			cal.B = temp;
+			input = cal.A.ToString();
+		}
+		else
+		{
+			input = cal.B.ToString();
+		}
 	}
 
 
